@@ -1,4 +1,4 @@
-import { send } from "process";
+//import { send } from "process";
 
 /*
 End User can evaluate an email they’ve written for “tone check” before sending. 
@@ -13,7 +13,7 @@ console.log('emailToneCheckPlugin.js - Start');
     console.log('Script executing immediately after load');
     let sendButtonProcessed = false;
 
-    async function sendButtonClickHandler(event: Event) {
+    function sendButtonClickHandler(event: Event) {
         console.log('emailToneCheckPlugin.ts: Inside sendButtonClickHandler');
         event.preventDefault();
         event.stopImmediatePropagation();
@@ -23,55 +23,22 @@ console.log('emailToneCheckPlugin.js - Start');
         //alert('emailToneCheckPlugin.ts: User clicked on Send Button');
         //fetchAndHandleToneCheck(event);
  
-        //const tonecheck = window.confirm('Do you want to tone check the email?');
-
-        let confirmToneCheck = await new Promise((resolve, reject) => {
-            setTimeout(() => resolve(window.confirm('Do you want to tone check the email?')), 0);
-        });
+        const confirmToneCheck = window.confirm('Do you want to tone check the email?');
 
         if (confirmToneCheck) {
             console.log('emailToneCheckPlugin.ts: User wants to tone check the email');
-            await fetchAndHandleToneCheck(event);
+            fetchAndHandleToneCheck(event);
         } else {
             console.log('emailToneCheckPlugin.ts: User does NOT want to tone check the email');
         }
      }
 
-    async function fetchAndHandleToneCheck(event: Event) {
+    function fetchAndHandleToneCheck(event: Event) {
         console.log('emailToneCheckPlugin.ts: Inside fetchAndHandleToneCheck');
         const emailContentElement = document.querySelector('[role="textbox"][aria-label*="Message Body"]');
         const emailContent = emailContentElement ? emailContentElement.textContent : '';
         console.log('emailToneCheckPlugin.ts fetchAndHandleToneCheck() Email Content: ', emailContent);
-        try {
-            let response = await fetch('http://localhost:3000/analyzeTone', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ emailContent: emailContent })
-            });
-            let data = await response.json();
-            if (!data) {
-                console.error('emailToneCheckPlugin.ts Error: Data received from tone analysis');
-                return;
-            } else if (!data.tone) {
-                console.error('emailToneCheckPlugin.ts Error: Data does not have a TONE property');
-                return;
-            } else {
-                console.log('Received Data', data);
-                console.log('emailToneCheckPlugin.ts: Tone Analysis Result: ', data.tone);
-                //Display the tone analysis result to the user
-                const toneAnalysisResult = window.confirm(`Tone Analysis Result:\n\n${data.tone}`);
-                if (toneAnalysisResult) {
-                    console.log('emailToneCheckPlugin.ts: User accepted the tone analysis result');
-                } else {
-                    console.log('emailToneCheckPlugin.ts: User discarded the tone analysis result');
-                }
-            }
-        } catch (error) {
-            console.error('emailToneCheckPlugin.ts: Error in tone analysis: ', error);
-        }
-        /*fetch('http://localhost:3000/analyzeTone', {
+        fetch('http://localhost:3000/analyzeTone', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -103,7 +70,7 @@ console.log('emailToneCheckPlugin.js - Start');
             })
             .catch(error => {
                 console.error('emailToneCheckPlugin.ts: Error in tone analysis: ', error);
-            });*/
+            });
     } 
 
     function addSendButtonClickHandler() {
