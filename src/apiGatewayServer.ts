@@ -35,6 +35,16 @@ app.get('/', (req: Request, res: Response) => {
     res.send('API Gateway Server is running');
 });
 
+app.get('/test-openai', async (req: Request, res: Response) => {
+    try {
+        const result = await openai.models.list();
+        console.log('API Gateway Server: OpenAI Models: ', result);
+        res.json(result);
+    } catch (error) {
+        console.error('API Gateway Server: Error in OpenAI test: ', error);
+    }
+});
+
 
 app.post('/analyzeTone', async (req: Request, res: Response) => {
     console.log('API Gateway Server: Analyzing tone');
