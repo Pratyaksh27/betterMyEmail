@@ -28,7 +28,13 @@ app.use((0, cors_1.default)());
 app.use(express_1.default.json());
 app.use(body_parser_1.default.json());
 const apiKey = process.env.OPENAI_API_KEY;
+if (!apiKey) {
+    throw new Error("The OPENAI_API_KEY environment variable is missing or empty.");
+}
 const openai = new openai_1.OpenAI({ apiKey });
+app.get('/', (req, res) => {
+    res.send('API Gateway Server is running');
+});
 app.post('/analyzeTone', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log('API Gateway Server: Analyzing tone');
     const emailContent = req.body.emailContent;

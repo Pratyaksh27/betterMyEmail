@@ -22,7 +22,16 @@ app.use(bodyParser.json());
 
 
 const apiKey = process.env.OPENAI_API_KEY;
+if (!apiKey) {
+    throw new Error("The OPENAI_API_KEY environment variable is missing or empty.");
+  }
+  
+
 const openai = new OpenAI({ apiKey });
+
+app.get('/', (req: Request, res: Response) => {
+    res.send('API Gateway Server is running');
+});
 
 
 app.post('/analyzeTone', async (req: Request, res: Response) => {
