@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+require('dotenv').config();
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const body_parser_1 = __importDefault(require("body-parser"));
@@ -20,7 +21,7 @@ const body_parser_1 = __importDefault(require("body-parser"));
 //import OpenAIApi from 'openai';
 //import OpenAI from 'openai';
 const openai_1 = require("openai");
-require('dotenv').config();
+//require('dotenv').config();
 const app = (0, express_1.default)();
 const port = process.env.PORT || 3000;
 const api_gateway_server = process.env.API_GATEWAY_SERVER;

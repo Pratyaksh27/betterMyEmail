@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 import express from 'express';
 import { Request, Response } from 'express';
 import axios from 'axios';
@@ -11,7 +13,7 @@ import { OpenAI } from 'openai';
 // import Configuration from 'openai';
 import dotenv from 'dotenv';
 
-require('dotenv').config();
+//require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 3000;
