@@ -11,7 +11,7 @@ import { OpenAI } from 'openai';
 // import Configuration from 'openai';
 import dotenv from 'dotenv';
 
-dotenv.config();
+require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 3000;
