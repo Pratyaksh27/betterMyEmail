@@ -46,18 +46,28 @@ app.get('/test-openai', (req, res) => __awaiter(void 0, void 0, void 0, function
         console.error('API Gateway Server: Error in OpenAI test: ', error);
     }
 }));
-app.post('/analyzeTone', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log('API Gateway Server: Analyzing tone');
+app.post('/analyzeEmail', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log('API Gateway Server: Analyzing Email Content...');
     const emailContent = req.body.emailContent;
     console.log('API Gateway Server: Email Content found: ', emailContent);
-    //res.send({ tone: 'Tone Analysis Complete' });
     try {
         const response = yield openai.chat.completions.create({
             model: 'gpt-4o',
             messages: [
                 {
                     role: "system",
-                    content: "You will be provided with a text which are contents of an email. Please check the tone of the email and give suggestions on how to tone it down. For ex. 'The tone of the email is too aggressive. Here is how you can tone it down....'"
+                    content: "You will be provided with the contents of an email. Your task is to evaluate and improve the email based on the following criteria:" +
+                        "\n1. **Tone and Politeness:** Assess the tone of the email. If it is too aggressive, suggest ways to make it more polite and professional." +
+                        "\n2. **Spelling and Grammar:** Identify and correct any spelling or grammatical errors." +
+                        "\n3. **Conciseness:** If the email is too long or verbose, suggest ways to make it more concise without losing important information." +
+                        "\n4. **Clarity and Coherence:** Ensure the email is clear and coherent. Suggest improvements if the message is confusing or disjointed." +
+                        "\n5. **Call to Action:** Evaluate the effectiveness of the call to action. Suggest improvements if it is weak or unclear." +
+                        "\n6. **Formatting:** Suggest any formatting changes that could improve readability, such as using bullet points, paragraphs, or headings." +
+                        "\n7. **Overall Impact:** Provide a summary of the overall impact of the email and any additional suggestions to enhance its effectiveness."
+                },
+                {
+                    role: "system",
+                    content: "Consider your answer as the END of the conversation. Do NOT end your response with a follow up question like 'Do you need further assistance?' or 'Is there anything else I can help you with?' as this will confuse the end user."
                 },
                 {
                     role: "user",
@@ -66,14 +76,13 @@ app.post('/analyzeTone', (req, res) => __awaiter(void 0, void 0, void 0, functio
             ],
             max_tokens: 1000
         });
-        const tone = response.choices[0].message.content;
-        //const tone = response.choices[0].text;
-        console.log('API Gateway Server: Tone Analysis Result: ', tone);
-        return res.json({ tone: tone });
+        const analysisResult = response.choices[0].message.content;
+        console.log('API Gateway Server: Email Analysis Result: ', analysisResult);
+        return res.json({ analysisResult: analysisResult });
     }
     catch (error) {
-        console.error('API Gateway Server: Error in tone analysis: ', error);
-        return res.status(500).send({ message: 'Failed to analyze tone', error: error });
+        console.error('API Gateway Server: Error in Email analysis: ', error);
+        return res.status(500).send({ message: 'Failed to analyze Email', error: error });
     }
 }));
 app.listen(port, () => {

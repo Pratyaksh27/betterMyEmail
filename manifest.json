@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "Email Tone Check Plugin",
+    "name": "Better My Email Plugin",
     "version": "1.0",
-    "description": "This extension will check the tone of your email and suggest changes to make it more polite.",
+    "description": "This extension will evaluate your email and suggest changes on the basis of: (1.) Tone and Politeness (2.) Spelling and Grammar (3.) Conciseness (4.)Clarity and Coherence (5.) Personalization (6.) Call to Action (7.) Formatting (8.) Subject Line (9.) Overall Impact ",
     "permissions": [
         "activeTab",
         "scripting",  
@@ -15,7 +15,7 @@
     "action": {
         "default_icon": "icons/icon.png",
         "default_popup": "popup.html",
-        "default_title": "Email Tone Check Plugin"
+        "default_title": "Better My Email Plugin"
     },
     "background": {
         "service_worker": "background.js"
@@ -23,7 +23,7 @@
     "content_scripts": [
         {
             "matches": ["*://mail.google.com/*"],
-            "js": ["dist/emailToneCheckPlugin.js"],
+            "js": ["dist/betterMyEmailPlugin.js"],
             "run_at": "document_idle"
         }
     ],

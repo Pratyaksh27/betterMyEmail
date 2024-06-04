@@ -5,7 +5,7 @@ try {
         console.log('background.js -  Inside chrome.action.onClicked');
         chrome.scripting.executeScript({
             target: {tabId: tab.id},
-            files: ['dist/emailToneCheckPlugin.js']
+            files: ['dist/betterMyEmailPlugin.js']
         });
     });
 } catch (error) {
