@@ -137,7 +137,7 @@ console.log('betterMyEmailPlugin.js - Start');
                 </menu>
             </form>
     `;
-    document.body.insertAdjacentHTML('beforeend', dialogEmailAnalysisResultHTML);
+    // document.body.insertAdjacentHTML('beforeend', dialogEmailAnalysisResultHTML);
     function showBetterMyEmailResultDialog(data) {
         const dialog = document.getElementById('betterMyEmailDialog');
         const content = document.getElementById('betterMyEmailDialogContent');
