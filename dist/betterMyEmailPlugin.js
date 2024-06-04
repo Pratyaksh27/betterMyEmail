@@ -1,4 +1,5 @@
 "use strict";
+//import { div } from 'react';
 //import { send } from "process";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -45,6 +46,8 @@ console.log('betterMyEmailPlugin.js - Start');
                 console.log('betterMyEmailPlugin.ts fetchBetterMyEmailAPI() Configs: ', configs);
                 if (configs && configs.analysis_URL) {
                     console.log('betterMyEmailPlugin.ts fetchBetterMyEmailAPI() API Gateway URL: ', configs.analysis_URL);
+                    // Show a loading modal to the user while the LLM generates a response
+                    // showLoadingModal();
                     yield fetch(`${configs.analysis_URL}`, {
                         method: 'POST',
                         headers: {
@@ -123,8 +126,9 @@ console.log('betterMyEmailPlugin.js - Start');
     }
     addBetterMyEmailButton();
     // Inject the dialog HTML into the DOM
-    const dialogHTML = `
-        <dialog id="betterMyEmailDialog" style="width: 650px !important;">
+    // This dialog will be used to display the Better my Email Analysis result
+    const dialogEmailAnalysisResultHTML = `
+        <dialog id="betterMyEmailDialog" style="width: 750px !important;">
             <form method="dialog">
                 <h1>Better My Email Result:</h1>
                 <p id="betterMyEmailDialogContent"></p>
@@ -133,7 +137,7 @@ console.log('betterMyEmailPlugin.js - Start');
                 </menu>
             </form>
     `;
-    document.body.insertAdjacentHTML('beforeend', dialogHTML);
+    document.body.insertAdjacentHTML('beforeend', dialogEmailAnalysisResultHTML);
     function showBetterMyEmailResultDialog(data) {
         const dialog = document.getElementById('betterMyEmailDialog');
         const content = document.getElementById('betterMyEmailDialogContent');
@@ -148,5 +152,29 @@ console.log('betterMyEmailPlugin.js - Start');
         dialog.addEventListener('close', function () {
             console.log('betterMyEmailPlugin.ts: Dialog closed');
         });
+    }
+    // The following modal will be shown to the user while they wait for the LLM to generate a response
+    // The modal will Fade out automatically after 5 seconds
+    const dialogLoadingHTML = `
+        <div id="betterMyEmailLoadingModal" class="modal">
+            <div class="modal-content">
+                <h1>Loading...</h1>
+                <p>Please wait upto 15 seconds while we analyze your email...</p>
+            </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', dialogLoadingHTML);
+    function showLoadingModal() {
+        console.log('betterMyEmailPlugin.ts: Showing loading modal');
+        const loadingModal = document.getElementById('betterMyEmailLoadingModal');
+        if (loadingModal) {
+            console.log('betterMyEmailPlugin.ts: Loading modal Found');
+            loadingModal.style.display = 'block';
+            setTimeout(() => {
+                loadingModal.style.display = 'none';
+            }, 5000);
+        }
+        else {
+            console.error('betterMyEmailPlugin.ts: Loading modal NOT Found');
+        }
     }
 })();

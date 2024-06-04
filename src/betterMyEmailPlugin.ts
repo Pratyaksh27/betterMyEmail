@@ -1,3 +1,4 @@
+//import { div } from 'react';
 //import { send } from "process";
 
 /*
@@ -36,6 +37,8 @@ console.log('betterMyEmailPlugin.js - Start');
             console.log('betterMyEmailPlugin.ts fetchBetterMyEmailAPI() Configs: ', configs);
             if (configs && configs.analysis_URL) {
                 console.log('betterMyEmailPlugin.ts fetchBetterMyEmailAPI() API Gateway URL: ', configs.analysis_URL);
+                // Show a loading modal to the user while the LLM generates a response
+                // showLoadingModal();
                 await fetch(`${configs.analysis_URL}`, {
                     method: 'POST',
                     headers: {
@@ -119,7 +122,9 @@ console.log('betterMyEmailPlugin.js - Start');
     addBetterMyEmailButton();
 
     // Inject the dialog HTML into the DOM
-    const dialogHTML = `
+    // This dialog will be used to display the Better my Email Analysis result
+
+    const dialogEmailAnalysisResultHTML = `
         <dialog id="betterMyEmailDialog" style="width: 750px !important;">
             <form method="dialog">
                 <h1>Better My Email Result:</h1>
@@ -129,7 +134,7 @@ console.log('betterMyEmailPlugin.js - Start');
                 </menu>
             </form>
     `;
-    document.body.insertAdjacentHTML('beforeend', dialogHTML);
+    document.body.insertAdjacentHTML('beforeend', dialogEmailAnalysisResultHTML);
 
     function showBetterMyEmailResultDialog(data:any) {
         const dialog = document.getElementById('betterMyEmailDialog') as HTMLDialogElement;
@@ -147,6 +152,32 @@ console.log('betterMyEmailPlugin.js - Start');
             console.log('betterMyEmailPlugin.ts: Dialog closed');
         });
     }
+
+    // The following modal will be shown to the user while they wait for the LLM to generate a response
+    // The modal will Fade out automatically after 5 seconds
+    const dialogLoadingHTML = `
+        <div id="betterMyEmailLoadingModal" class="modal">
+            <div class="modal-content">
+                <h1>Loading...</h1>
+                <p>Please wait upto 15 seconds while we analyze your email...</p>
+            </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', dialogLoadingHTML);
+
+    function showLoadingModal() {
+        console.log('betterMyEmailPlugin.ts: Showing loading modal');
+        const loadingModal = document.getElementById('betterMyEmailLoadingModal') as HTMLDivElement;
+        if (loadingModal) {
+            console.log('betterMyEmailPlugin.ts: Loading modal Found');
+            loadingModal.style.display = 'block';
+            setTimeout(() => {
+                loadingModal.style.display = 'none';
+            }, 5000);
+        } else {
+            console.error('betterMyEmailPlugin.ts: Loading modal NOT Found');
+        }
+    }
+
 
 
 })();

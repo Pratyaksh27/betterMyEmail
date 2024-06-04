@@ -67,7 +67,7 @@ app.post('/analyzeEmail', async (req: Request, res: Response) => {
                 },
                 {
                     role: "system",
-                    content: "Consider your answer as the END of the conversation. Do NOT end your response with a follow up question like 'Do you need further assistance?' or 'Is there anything else I can help you with?' as this will confuse the end user."
+                    content: "Consider your answer as the END of the conversation. Do NOT end your response with a follow up question like 'Do you need further assistance?' or 'Is there anything else I can help you with?'  or 'If you have any questions, please feel free to reach out' as this will confuse the end user. Dont suggest the user to ask further questions."
                 },
                 {
                     role: "user",
