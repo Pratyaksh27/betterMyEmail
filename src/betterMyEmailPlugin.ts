@@ -134,7 +134,7 @@ console.log('betterMyEmailPlugin.js - Start');
                 </menu>
             </form>
     `;
-    // document.body.insertAdjacentHTML('beforeend', dialogEmailAnalysisResultHTML);
+    document.body.insertAdjacentHTML('beforeend', dialogEmailAnalysisResultHTML);
 
     function showBetterMyEmailResultDialog(data:any) {
         const dialog = document.getElementById('betterMyEmailDialog') as HTMLDialogElement;
@@ -162,7 +162,7 @@ console.log('betterMyEmailPlugin.js - Start');
                 <p>Please wait upto 15 seconds while we analyze your email...</p>
             </div>
     `;
-    document.body.insertAdjacentHTML('beforeend', dialogLoadingHTML);
+    //document.body.insertAdjacentHTML('beforeend', dialogLoadingHTML);
 
     function showLoadingModal() {
         console.log('betterMyEmailPlugin.ts: Showing loading modal');
