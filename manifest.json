@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "Better My Email Plugin",
     "version": "1.0",
-    "description": "This extension will evaluate your email and suggest changes on the basis of: (1.) Tone and Politeness (2.) Spelling and Grammar (3.) Conciseness (4.)Clarity and Coherence (5.) Personalization (6.) Call to Action (7.) Formatting (8.) Subject Line (9.) Overall Impact ",
+    "description": "Extension will evaluate/suggest edits on the basis of Tone, Grammar, Conciseness, Clarity, Personalization,Formatting & Impact",
     "permissions": [
         "activeTab",
         "scripting",  
