@@ -4,13 +4,7 @@
     "version": "1.0",
     "description": "Extension will evaluate/suggest edits on the basis of Tone, Grammar, Conciseness, Clarity, Personalization,Formatting & Impact",
     "permissions": [
-        "activeTab",
-        "scripting",  
         "storage"
-    ],
-    "host_permissions": [
-        "<all_urls>",
-        "https://mail.google.com/*"
     ],
     "action": {
         "default_icon": "icons/icon.png",
