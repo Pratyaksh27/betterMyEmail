@@ -29,6 +29,8 @@ console.log('betterMyEmailPlugin.js - Start');
     }
     async function fetchBetterMyEmailAPI(event: Event) {
         console.log('betterMyEmailPlugin.ts: Inside fetchBetterMyEmailAPI');
+        // Show the spinner
+        document.getElementById('betterMyEmailSpinner')!.style.display = 'block';
         const emailContentElement = document.querySelector('[role="textbox"][aria-label*="Message Body"]');
         const emailContent = emailContentElement ? emailContentElement.textContent : '';
         console.log('betterMyEmailPlugin.ts fetchBetterMyEmailAPI() Email Content: ', emailContent);
@@ -68,6 +70,8 @@ console.log('betterMyEmailPlugin.js - Start');
                     } else {
                         console.log('betterMyEmailPlugin.ts: User discarded the Better my Email Analysis result');
                     }*/
+                    // Hide the spinner when data is received
+                    document.getElementById('betterMyEmailSpinner')!.style.display = 'none';
                     showBetterMyEmailResultDialog(data);
                 })
                 .catch(error => {
@@ -153,32 +157,24 @@ console.log('betterMyEmailPlugin.js - Start');
         });
     }
 
-    // The following modal will be shown to the user while they wait for the LLM to generate a response
-    // The modal will Fade out automatically after 5 seconds
-    const dialogLoadingHTML = `
-        <div id="betterMyEmailLoadingModal" class="modal">
-            <div class="modal-content">
-                <h1>Loading...</h1>
-                <p>Please wait upto 15 seconds while we analyze your email...</p>
-            </div>
+    const spinnerHTML = `
+        <div id="betterMyEmailSpinner" style="display:none; position: fixed; z-index: 999; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+            <div style="border: 8px solid #f3f3f3; border-radius: 50%; border-top: 8px solid #3498db; width: 60px; height: 60px; -webkit-animation: spin 2s linear infinite; animation: spin 2s linear infinite;"></div>
+        </div>
+
+        <style>
+            @-webkit-keyframes spin {
+            0% { -webkit-transform: rotate(0deg); }
+            100% { -webkit-transform: rotate(360deg); }
+            }
+
+            @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+            }
+        </style>
     `;
-    //document.body.insertAdjacentHTML('beforeend', dialogLoadingHTML);
-
-    function showLoadingModal() {
-        console.log('betterMyEmailPlugin.ts: Showing loading modal');
-        const loadingModal = document.getElementById('betterMyEmailLoadingModal') as HTMLDivElement;
-        if (loadingModal) {
-            console.log('betterMyEmailPlugin.ts: Loading modal Found');
-            loadingModal.style.display = 'block';
-            setTimeout(() => {
-                loadingModal.style.display = 'none';
-            }, 5000);
-        } else {
-            console.error('betterMyEmailPlugin.ts: Loading modal NOT Found');
-        }
-    }
-
-
+    document.body.insertAdjacentHTML('beforeend', spinnerHTML);
 
 })();
 
