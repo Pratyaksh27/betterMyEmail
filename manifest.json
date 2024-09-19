@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Better My Email Plugin",
-    "version": "1.1",
+    "version": "1.2",
     "description": "Extension will evaluate/suggest edits on the basis of Tone, Grammar, Conciseness, Clarity, Personalization,Formatting & Impact",
     "permissions": [
         "storage"

@@ -138,7 +138,8 @@ console.log('betterMyEmailPlugin.js - Start');
                 <h1>Better My Email Result:</h1>
                 <p id="betterMyEmailDialogContent"></p>
                 <menu>
-                    <button value="default">Okay</button>
+                    <button id="acceptButton" type="button">Accept</button>
+                    <button id="discardButton" type="button">Discard</button>
                 </menu>
             </form>
     `;
@@ -147,12 +148,13 @@ console.log('betterMyEmailPlugin.js - Start');
     function showBetterMyEmailResultDialog(data:{ recommendedEmail: string; rationale: string }) {
         const dialog = document.getElementById('betterMyEmailDialog') as HTMLDialogElement;
         const content = document.getElementById('betterMyEmailDialogContent');
-        if (!dialog || !content) {
+        const acceptButton = document.getElementById('acceptButton') as HTMLButtonElement;
+        const discardButton = document.getElementById('discardButton') as HTMLButtonElement;
+
+        if (!dialog || !content || !acceptButton || !discardButton) {
             console.error('betterMyEmailPlugin.ts: Dialog element not found');
             return;
         }
-        //content.textContent = data.analysisResult;
-        // const formattedData = data.analysisResult.replace(/\n/g, '<br>');
         content.innerHTML = `
             <h2>Recommended Email:</h2>
             <div id="recommendedEmailContent">${data.recommendedEmail.replace(/\n/g, '<br>')}</div>
@@ -161,9 +163,27 @@ console.log('betterMyEmailPlugin.js - Start');
             `;
         dialog.showModal();
 
+        acceptButton.onclick = function() {
+            replaceEmailContent(data.recommendedEmail);
+            dialog.close();
+        };
+        discardButton.onclick = function() {
+            dialog.close();
+        };
+
         dialog.addEventListener('close', function() {
             console.log('betterMyEmailPlugin.ts: Dialog closed');
         });
+    }
+
+    function replaceEmailContent(recommendedEmailContent: string) {
+        const emailContentElement = document.querySelector('[role="textbox"][aria-label*="Message Body"]');
+        if (emailContentElement) {
+            // TODO : For Security use DOMPurify for sanitizing the HTML
+            emailContentElement.innerHTML = recommendedEmailContent.replace(/\n/g, '<br>');
+        } else {
+            console.error('betterMyEmailPlugin.ts: Email Content Element not found');
+        }
     }
 
     const spinnerHTML = `
