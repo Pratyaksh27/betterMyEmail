@@ -56,14 +56,27 @@ app.post('/analyzeEmail', async (req: Request, res: Response) => {
             messages: [
                 { 
                     role: "system", 
-                    content: "You will be provided with the contents of an email. Your task is to evaluate and improve the email based on the following criteria:" +
-                    "\n1. **Tone and Politeness:** Assess the tone of the email. If it is too aggressive, suggest ways to make it more polite and professional." +
-                    "\n2. **Spelling and Grammar:** Identify and correct any spelling or grammatical errors." +
-                    "\n3. **Conciseness:** If the email is too long or verbose, suggest ways to make it more concise without losing important information." +
-                    "\n4. **Clarity and Coherence:** Ensure the email is clear and coherent. Suggest improvements if the message is confusing or disjointed." +
-                    "\n5. **Call to Action:** Evaluate the effectiveness of the call to action. Suggest improvements if it is weak or unclear." +
-                    "\n6. **Formatting:** Suggest any formatting changes that could improve readability, such as using bullet points, paragraphs, or headings." +
-                    "\n7. **Overall Impact:** Provide a summary of the overall impact of the email and any additional suggestions to enhance its effectiveness."
+                    content: `You will be provided with the contents of an email. Your task is to evaluate and improve the email based on the following criteria:
+
+                    1. **Tone and Politeness:** Assess the tone of the email. If it is too aggressive, suggest ways to make it more polite and professional.
+                    2. **Spelling and Grammar:** Identify and correct any spelling or grammatical errors.
+                    3. **Conciseness:** If the email is too long or verbose, suggest ways to make it more concise without losing important information.
+                    4. **Clarity and Coherence:** Ensure the email is clear and coherent. Suggest improvements if the message is confusing or disjointed.
+                    5. **Call to Action:** Evaluate the effectiveness of the call to action. Suggest improvements if it is weak or unclear.
+                    6. **Formatting:** Suggest any formatting changes that could improve readability, such as using bullet points, paragraphs, or headings.
+                    7. **Overall Impact:** Provide a summary of the overall impact of the email and any additional suggestions to enhance its effectiveness.
+                    
+                    Please provide your response in the following JSON format:
+                    
+                    \`\`\`json
+                    {
+                      "recommended_email": "Your improved email here",
+                      "rationale": "Explanation of the improvements made"
+                    }
+                    \`\`\`
+                    
+                    Ensure that the JSON is valid and properly formatted. Do not include any additional text outside of the JSON block.`
+                    
                 },
                 {
                     role: "system",
@@ -72,9 +85,14 @@ app.post('/analyzeEmail', async (req: Request, res: Response) => {
                 {
                     role: "user",
                     content: emailContent
+                },
+                {
+                    role: "assistant",
+                    content: "Remember, only output the JSON response in the specified format without any additional text."
                 }
             ],
-            max_tokens: 1000
+            max_tokens: 1000,
+            temperature: 0.3,
         });
         const analysisResult = response.choices[0].message.content;
         console.log('API Gateway Server: Email Analysis Result: ', analysisResult);

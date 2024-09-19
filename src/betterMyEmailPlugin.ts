@@ -61,18 +61,22 @@ console.log('betterMyEmailPlugin.js - Start');
                         console.error('betterMyEmailPlugin.ts Error: Data does not have a analysisResult property');
                         return;
                     }
-                    console.log('Received Data', data);
-                    console.log('betterMyEmailPlugin.ts: Better my Email Analysis Result: ', data.analysisResult);
-                    //Display the Better my Email Analysis result to the user
-                    /*const betterMyEmailResult = window.confirm(`Better my Email Analysis Result:\n\n${data.analysisResult}`);
-                    if (betterMyEmailResult) {
-                        console.log('betterMyEmailPlugin.ts: User accepted the Better my Email Analysis result');
-                    } else {
-                        console.log('betterMyEmailPlugin.ts: User discarded the Better my Email Analysis result');
-                    }*/
+                    let analysisResultJson;
+                    try{
+                        const jsonString = data.analysisResult.replace(/```json|```/g, '').trim();
+                        analysisResultJson = JSON.parse(jsonString);
+                    } catch (error) {
+                        console.error('betterMyEmailPlugin.ts Error: Parsing analysisResult JSON: ', error);
+                        console.error('Received BetterMyEmail analysisResult JSON: ', data.analysisResult);
+                        return;
+                    }
+                    const recommendedEmail = analysisResultJson.recommended_email;
+                    const rationale = analysisResultJson.rationale;
+                    console.log('betterMyEmailPlugin.ts: Recommended Email: ', recommendedEmail);
+                    console.log('betterMyEmailPlugin.ts: Rationale: ', rationale);
                     // Hide the spinner when data is received
                     document.getElementById('betterMyEmailSpinner')!.style.display = 'none';
-                    showBetterMyEmailResultDialog(data);
+                    showBetterMyEmailResultDialog({ recommendedEmail, rationale });
                 })
                 .catch(error => {
                     console.error('betterMyEmailPlugin.ts: Error in Better my Email Analysis: ', error);
@@ -140,7 +144,7 @@ console.log('betterMyEmailPlugin.js - Start');
     `;
     document.body.insertAdjacentHTML('beforeend', dialogEmailAnalysisResultHTML);
 
-    function showBetterMyEmailResultDialog(data:any) {
+    function showBetterMyEmailResultDialog(data:{ recommendedEmail: string; rationale: string }) {
         const dialog = document.getElementById('betterMyEmailDialog') as HTMLDialogElement;
         const content = document.getElementById('betterMyEmailDialogContent');
         if (!dialog || !content) {
@@ -148,8 +152,13 @@ console.log('betterMyEmailPlugin.js - Start');
             return;
         }
         //content.textContent = data.analysisResult;
-        const formattedData = data.analysisResult.replace(/\n/g, '<br>');
-        content.innerHTML = formattedData;
+        // const formattedData = data.analysisResult.replace(/\n/g, '<br>');
+        content.innerHTML = `
+            <h2>Recommended Email:</h2>
+            <div id="recommendedEmailContent">${data.recommendedEmail.replace(/\n/g, '<br>')}</div>
+            <h2>Rationale for the Recommendation:</h2>
+            <div>${data.rationale.replace(/\n/g, '<br>')}</div>
+            `;
         dialog.showModal();
 
         dialog.addEventListener('close', function() {
