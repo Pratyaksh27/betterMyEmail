@@ -155,11 +155,30 @@ console.log('betterMyEmailPlugin.js - Start');
             console.error('betterMyEmailPlugin.ts: Dialog element not found');
             return;
         }
+        // Replace line breaks in the recommended email
+        const recommendedEmailContent = data.recommendedEmail.replace(/\n/g, '<br>');
+        // We had a bug where the rationale being returned was sometimes a string
+        // and sometimes an object. So we handle rationale based on its type
+        let rationaleContent = '';
+        if (typeof data.rationale === 'string') {
+            rationaleContent = data.rationale.replace(/\n/g, '<br>');
+        } else if (typeof data.rationale === 'object') {
+            // Convert the rationale object to an HTML string, applying .replace for each value
+            for (const [key, value] of Object.entries(data.rationale)) {
+                if (typeof value === 'string') {
+                    rationaleContent += `<strong>${key}:</strong> ${value.replace(/\n/g, '<br>')}<br>`;
+                } else {
+                    rationaleContent += `<strong>${key}:</strong> ${value}<br>`; // Handle non-string values (if needed)
+                }
+            }
+        } else {
+            rationaleContent = 'No rationale provided.';
+        }
         content.innerHTML = `
             <h2>Recommended Email:</h2>
-            <div id="recommendedEmailContent">${data.recommendedEmail.replace(/\n/g, '<br>')}</div>
+            <div id="recommendedEmailContent">${recommendedEmailContent}</div>
             <h2>Rationale for the Recommendation:</h2>
-            <div>${data.rationale.replace(/\n/g, '<br>')}</div>
+            <div>${rationaleContent}</div>
             `;
         dialog.showModal();
 
