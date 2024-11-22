@@ -1,6 +1,3 @@
-"use strict";
-//import { div } from 'react';
-//import { send } from "process";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -10,6 +7,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+//import { div } from 'react';
+//import { send } from "process";
+import { FeedbackManager } from "./feedback.mjs";
 /*
 End User can evaluate an email they’ve written to “Better my email” before sending.
 The Plugin will “evaluate” the email and give personalized recommendations.
@@ -34,6 +34,8 @@ function getConfigs() {
 }
 function fetchBetterMyEmailAPI(event) {
     return __awaiter(this, void 0, void 0, function* () {
+        // Increment the Usage count in the Feedback Manager
+        FeedbackManager.incrementUsage();
         console.log('betterMyEmailPlugin.ts: Inside fetchBetterMyEmailAPI');
         // Show the spinner
         document.getElementById('betterMyEmailSpinner').style.display = 'block';
@@ -159,10 +161,17 @@ function showBetterMyEmailResultDialog(data) {
         `;
     dialog.showModal();
     acceptButton.onclick = function () {
+        // Check If Feedback form should be shown
+        if (FeedbackManager.shouldShowFeedbackPopup()) {
+            console.log('betterMyEmailPlugin.ts Accept Button Clicked: Showing Feedback Form');
+        }
         replaceEmailContent(data.recommendedEmail);
         dialog.close();
     };
     discardButton.onclick = function () {
+        if (FeedbackManager.shouldShowFeedbackPopup()) {
+            console.log('betterMyEmailPlugin.ts Discard Button Clicked: Showing Feedback Form');
+        }
         dialog.close();
     };
     dialog.addEventListener('close', function () {

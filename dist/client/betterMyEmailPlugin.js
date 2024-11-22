@@ -1,94 +1,106 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 //import { div } from 'react';
 //import { send } from "process";
-
+import { FeedbackManager } from "./feedback.js";
 /*
-End User can evaluate an email they’ve written to “Better my email” before sending. 
-The Plugin will “evaluate” the email and give personalized recommendations. 
+End User can evaluate an email they’ve written to “Better my email” before sending.
+The Plugin will “evaluate” the email and give personalized recommendations.
 Users can Accept/Discard the suggestion
 
 USer Clicks on Send Button. He is taken to a Plugin asking if he wishes to Better their email.
 */
 console.log('betterMyEmailPlugin.js - Start');
-
-function getConfigs(): Promise<any> {
+function getConfigs() {
     return new Promise((resolve, reject) => {
-        chrome.storage.sync.get(['config'], function(result: any) {
+        chrome.storage.sync.get(['config'], function (result) {
             if (result.config) {
                 console.log('betterMyEmailPlugin.ts: getConfigs() Configs found: ', result.config);
                 resolve(result.config);
-            } else {
+            }
+            else {
                 console.log('betterMyEmailPlugin.ts: getConfigs() Configs NOT found');
                 reject(new Error('Configs not found'));
             }
         });
     });
 }
-
-async function fetchBetterMyEmailAPI(event: Event) {
-    console.log('betterMyEmailPlugin.ts: Inside fetchBetterMyEmailAPI');
-    // Show the spinner
-    document.getElementById('betterMyEmailSpinner')!.style.display = 'block';
-    const emailContentElement = document.querySelector('[role="textbox"][aria-label*="Message Body"]');
-    const emailContent = emailContentElement ? emailContentElement.textContent : '';
-    console.log('betterMyEmailPlugin.ts fetchBetterMyEmailAPI() Email Content: ', emailContent);
-    try {
-        const configs = await getConfigs();
-        console.log('betterMyEmailPlugin.ts fetchBetterMyEmailAPI() Configs: ', configs);
-        if (configs && configs.analysis_URL) {
-            console.log('betterMyEmailPlugin.ts fetchBetterMyEmailAPI() API Gateway URL: ', configs.analysis_URL);
-            // Show a loading modal to the user while the LLM generates a response
-            // showLoadingModal();
-            await fetch(`${configs.analysis_URL}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ emailContent: emailContent })
-            })
-            .then(response => {
-                console.log('betterMyEmailPlugin.ts: Printing Better my Email Analysis Response: ');
-                console.log('betterMyEmailPlugin.ts: Better my Email Analysis Response: ', response);
-                return response.json()
-            })
-            .then(data => {
-                if (!data) {
-                    console.error('betterMyEmailPlugin.ts Error: Data received from Better my Email Analysis');
-                    return;
-                } else if (!data.analysisResult) {
-                    console.error('betterMyEmailPlugin.ts Error: Data does not have a analysisResult property');
-                    return;
-                }
-                let analysisResultJson;
-                try{
-                    const jsonString = data.analysisResult.replace(/```json|```/g, '').trim();
-                    analysisResultJson = JSON.parse(jsonString);
-                } catch (error) {
-                    console.error('betterMyEmailPlugin.ts Error: Parsing analysisResult JSON: ', error);
-                    console.error('Received BetterMyEmail analysisResult JSON: ', data.analysisResult);
-                    return;
-                }
-                const recommendedEmail = analysisResultJson.recommended_email;
-                const rationale = analysisResultJson.rationale;
-                console.log('betterMyEmailPlugin.ts: Recommended Email: ', recommendedEmail);
-                console.log('betterMyEmailPlugin.ts: Rationale: ', rationale);
-                // Hide the spinner when data is received
-                document.getElementById('betterMyEmailSpinner')!.style.display = 'none';
-                showBetterMyEmailResultDialog({ recommendedEmail, rationale });
-            })
-            .catch(error => {
-                console.error('betterMyEmailPlugin.ts: Error in Better my Email Analysis: ', error);
-            });
-            
-        } else {
-            console.error('betterMyEmailPlugin.ts fetchBetterMyEmailAPI() Configs not found');
+function fetchBetterMyEmailAPI(event) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // Increment the Usage count in the Feedback Manager
+        FeedbackManager.incrementUsage();
+        console.log('betterMyEmailPlugin.ts: Inside fetchBetterMyEmailAPI');
+        // Show the spinner
+        document.getElementById('betterMyEmailSpinner').style.display = 'block';
+        const emailContentElement = document.querySelector('[role="textbox"][aria-label*="Message Body"]');
+        const emailContent = emailContentElement ? emailContentElement.textContent : '';
+        console.log('betterMyEmailPlugin.ts fetchBetterMyEmailAPI() Email Content: ', emailContent);
+        try {
+            const configs = yield getConfigs();
+            console.log('betterMyEmailPlugin.ts fetchBetterMyEmailAPI() Configs: ', configs);
+            if (configs && configs.analysis_URL) {
+                console.log('betterMyEmailPlugin.ts fetchBetterMyEmailAPI() API Gateway URL: ', configs.analysis_URL);
+                // Show a loading modal to the user while the LLM generates a response
+                // showLoadingModal();
+                yield fetch(`${configs.analysis_URL}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ emailContent: emailContent })
+                })
+                    .then(response => {
+                    console.log('betterMyEmailPlugin.ts: Printing Better my Email Analysis Response: ');
+                    console.log('betterMyEmailPlugin.ts: Better my Email Analysis Response: ', response);
+                    return response.json();
+                })
+                    .then(data => {
+                    if (!data) {
+                        console.error('betterMyEmailPlugin.ts Error: Data received from Better my Email Analysis');
+                        return;
+                    }
+                    else if (!data.analysisResult) {
+                        console.error('betterMyEmailPlugin.ts Error: Data does not have a analysisResult property');
+                        return;
+                    }
+                    let analysisResultJson;
+                    try {
+                        const jsonString = data.analysisResult.replace(/```json|```/g, '').trim();
+                        analysisResultJson = JSON.parse(jsonString);
+                    }
+                    catch (error) {
+                        console.error('betterMyEmailPlugin.ts Error: Parsing analysisResult JSON: ', error);
+                        console.error('Received BetterMyEmail analysisResult JSON: ', data.analysisResult);
+                        return;
+                    }
+                    const recommendedEmail = analysisResultJson.recommended_email;
+                    const rationale = analysisResultJson.rationale;
+                    console.log('betterMyEmailPlugin.ts: Recommended Email: ', recommendedEmail);
+                    console.log('betterMyEmailPlugin.ts: Rationale: ', rationale);
+                    // Hide the spinner when data is received
+                    document.getElementById('betterMyEmailSpinner').style.display = 'none';
+                    showBetterMyEmailResultDialog({ recommendedEmail, rationale });
+                })
+                    .catch(error => {
+                    console.error('betterMyEmailPlugin.ts: Error in Better my Email Analysis: ', error);
+                });
+            }
+            else {
+                console.error('betterMyEmailPlugin.ts fetchBetterMyEmailAPI() Configs not found');
+            }
         }
-    
-        
-        } catch (error) {
+        catch (error) {
             console.error('betterMyEmailPlugin.ts: Error in Better my Email Analysis: ', error);
         }
-} 
-
+    });
+}
 function createBetterMyEmailButton() {
     const button = document.createElement('button');
     button.textContent = 'Better My Email';
@@ -96,8 +108,7 @@ function createBetterMyEmailButton() {
     button.onclick = fetchBetterMyEmailAPI;
     return button;
 }
-
-function addBetterMyEmailButton(){
+function addBetterMyEmailButton() {
     const sendButton = document.querySelector('[role="button"][aria-label*="Send"], [role="button"][data-tooltip*="Send"]');
     if (sendButton && sendButton.parentNode) {
         if (!sendButton.nextSibling || sendButton.nextSibling.textContent !== 'Better My Email') {
@@ -105,18 +116,17 @@ function addBetterMyEmailButton(){
             sendButton.parentNode.insertBefore(betterMyEmailButton, sendButton.nextSibling);
         }
         console.log('betterMyEmailPlugin.js: Send Button Found');
-    } else {
+    }
+    else {
         //console.log('betterMyEmailPlugin.js: Send Button NOT Found. Will check again.');
-        setTimeout(addBetterMyEmailButton, 1000);  // Retry after 1 second
+        setTimeout(addBetterMyEmailButton, 1000); // Retry after 1 second
     }
 }
-
-function showBetterMyEmailResultDialog(data:{ recommendedEmail: string; rationale: string }) {
-    const dialog = document.getElementById('betterMyEmailDialog') as HTMLDialogElement;
+function showBetterMyEmailResultDialog(data) {
+    const dialog = document.getElementById('betterMyEmailDialog');
     const content = document.getElementById('betterMyEmailDialogContent');
-    const acceptButton = document.getElementById('acceptButton') as HTMLButtonElement;
-    const discardButton = document.getElementById('discardButton') as HTMLButtonElement;
-
+    const acceptButton = document.getElementById('acceptButton');
+    const discardButton = document.getElementById('discardButton');
     if (!dialog || !content || !acceptButton || !discardButton) {
         console.error('betterMyEmailPlugin.ts: Dialog element not found');
         return;
@@ -128,16 +138,19 @@ function showBetterMyEmailResultDialog(data:{ recommendedEmail: string; rational
     let rationaleContent = '';
     if (typeof data.rationale === 'string') {
         rationaleContent = data.rationale.replace(/\n/g, '<br>');
-    } else if (typeof data.rationale === 'object') {
+    }
+    else if (typeof data.rationale === 'object') {
         // Convert the rationale object to an HTML string, applying .replace for each value
         for (const [key, value] of Object.entries(data.rationale)) {
             if (typeof value === 'string') {
                 rationaleContent += `<strong>${key}:</strong> ${value.replace(/\n/g, '<br>')}<br>`;
-            } else {
+            }
+            else {
                 rationaleContent += `<strong>${key}:</strong> ${value}<br>`; // Handle non-string values (if needed)
             }
         }
-    } else {
+    }
+    else {
         rationaleContent = 'No rationale provided.';
     }
     content.innerHTML = `
@@ -147,30 +160,34 @@ function showBetterMyEmailResultDialog(data:{ recommendedEmail: string; rational
         <div>${rationaleContent}</div>
         `;
     dialog.showModal();
-
-    acceptButton.onclick = function() {
+    acceptButton.onclick = function () {
+        // Check If Feedback form should be shown
+        if (FeedbackManager.shouldShowFeedbackPopup()) {
+            console.log('betterMyEmailPlugin.ts Accept Button Clicked: Showing Feedback Form');
+        }
         replaceEmailContent(data.recommendedEmail);
         dialog.close();
     };
-    discardButton.onclick = function() {
+    discardButton.onclick = function () {
+        if (FeedbackManager.shouldShowFeedbackPopup()) {
+            console.log('betterMyEmailPlugin.ts Discard Button Clicked: Showing Feedback Form');
+        }
         dialog.close();
     };
-
-    dialog.addEventListener('close', function() {
+    dialog.addEventListener('close', function () {
         console.log('betterMyEmailPlugin.ts: Dialog closed');
     });
 }
-
-function replaceEmailContent(recommendedEmailContent: string) {
+function replaceEmailContent(recommendedEmailContent) {
     const emailContentElement = document.querySelector('[role="textbox"][aria-label*="Message Body"]');
     if (emailContentElement) {
         // TODO : For Security use DOMPurify for sanitizing the HTML
         emailContentElement.innerHTML = recommendedEmailContent.replace(/\n/g, '<br>');
-    } else {
+    }
+    else {
         console.error('betterMyEmailPlugin.ts: Email Content Element not found');
     }
 }
-
 function getSpinnerHTML() {
     return `
         <div id="betterMyEmailSpinner" style="display:none; position: fixed; z-index: 999; top: 50%; left: 50%; transform: translate(-50%, -50%);">
@@ -190,11 +207,9 @@ function getSpinnerHTML() {
         </style>
     `;
 }
-
-(function() {
+(function () {
     console.log('Script executing immediately after load');
     let sendButtonProcessed = false;
-
     const observer = new MutationObserver(mutations => {
         mutations.forEach(mutation => {
             if (mutation.addedNodes.length > 0) {
@@ -204,19 +219,14 @@ function getSpinnerHTML() {
             }
         });
     });
-
     observer.observe(document.body, { childList: true, subtree: true });
-
-    function restartObserver(){
+    function restartObserver() {
         observer.observe(document.body, { childList: true, subtree: true });
         addBetterMyEmailButton();
     }
-
     addBetterMyEmailButton();
-
     // Inject the dialog HTML into the DOM
     // This dialog will be used to display the Better my Email Analysis result
-
     const dialogEmailAnalysisResultHTML = `
         <dialog id="betterMyEmailDialog" style="width: 750px !important;">
             <form method="dialog">
@@ -229,8 +239,5 @@ function getSpinnerHTML() {
             </form>
     `;
     document.body.insertAdjacentHTML('beforeend', dialogEmailAnalysisResultHTML);
-
     document.body.insertAdjacentHTML('beforeend', getSpinnerHTML());
-
 })();
-
