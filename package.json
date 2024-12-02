@@ -22,15 +22,15 @@
     "@types/express": "^4.17.21",
     "@types/node": "^20.12.11",
     "ts-loader": "^9.5.1",
-    "webpack": "^5.91.0",
+    "webpack": "^5.96.1",
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
     "axios": "^1.6.8",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "openai": "^4.47.1",
-    "dotenv": "^16.4.5"
+    "openai": "^4.47.1"
   }
 }
