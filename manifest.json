@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Better My Email",
-    "version": "1.6",
+    "version": "1.8",
     "description": "Extension will evaluate/suggest edits on the basis of Tone, Grammar, Conciseness, Clarity, Personalization,Formatting & Impact",
     "permissions": [
         "storage"
