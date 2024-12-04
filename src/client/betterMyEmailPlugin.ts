@@ -1,6 +1,6 @@
 //import { div } from 'react';
 //import { send } from "process";
-import { FeedbackManager } from "./feedback.js";
+import { FeedbackManager } from "./feedback";
 
 /*
 End User can evaluate an email they’ve written to “Better my email” before sending. 
@@ -85,11 +85,16 @@ async function fetchBetterMyEmailAPI(event: Event) {
         } else {
             console.error('betterMyEmailPlugin.ts fetchBetterMyEmailAPI() Configs not found');
         }
-    
-        
-        } catch (error) {
-            console.error('betterMyEmailPlugin.ts: Error in Better my Email Analysis: ', error);
-        }
+      
+    } catch (error) {
+        console.error('betterMyEmailPlugin.ts: Error in Better my Email Analysis: ', error);
+    }
+    // Should we show the Feedback Form
+    if (FeedbackManager.shouldShowFeedbackPopup()) {
+        console.log('betterMyEmailPlugin.ts: Showing Feedback Form');
+    } else {
+        console.log('betterMyEmailPlugin.ts: Not showing Feedback Form');
+    }
 } 
 
 function createBetterMyEmailButton() {

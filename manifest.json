@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "name": "Better My Email Plugin",
+    "name": "Better My Email",
     "version": "1.6",
     "description": "Extension will evaluate/suggest edits on the basis of Tone, Grammar, Conciseness, Clarity, Personalization,Formatting & Impact",
     "permissions": [
@@ -9,18 +9,16 @@
     "action": {
         "default_icon": "icons/icon.png",
         "default_popup": "popup.html",
-        "default_title": "Better My Email Plugin"
+        "default_title": "Better My Email"
     },
     "background": {
-        "service_worker": "background.js",
-        "type": "module"
+        "service_worker": "background.js"
     },
     "content_scripts": [
         {
             "matches": ["*://mail.google.com/*"],
             "js": ["dist/client/betterMyEmailPlugin.js"],
-            "run_at": "document_idle",
-            "type": "module"
+            "run_at": "document_idle"
         }
     ],
     "icons": {
