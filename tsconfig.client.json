@@ -2,15 +2,16 @@
 {
     "compilerOptions": {
         "target": "es6",
-        "module": "commonjs",
-        "outDir": "./dist",
-        "rootDir": "./src",
+        "module": "ES2020",
+        "outDir": "./dist/client",
+        "rootDir": "./src/client",
         "strict": true,
+        "allowJs": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
         "lib": ["es6", "dom", "es2017"]
     },
-    "include": ["src/**/*"],
+    "include": ["src/client/**/*"],
     "exclude": ["node_modules"]
 }

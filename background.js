@@ -5,7 +5,7 @@ try {
         console.log('background.js -  Inside chrome.action.onClicked');
         chrome.scripting.executeScript({
             target: {tabId: tab.id},
-            files: ['dist/betterMyEmailPlugin.js']
+            files: ['dist/client/betterMyEmailPlugin.js']
         });
     });
 } catch (error) {
@@ -19,7 +19,7 @@ fetch(configUrl)
     .then(data => {
         config = data;
         chrome.storage.sync.set({config: config}, () => {
-            console.log('background.js - Config is set to ', config);
+            // console.log('background.js - Config is set to ', config);
         });
     }).catch(
     error => {
