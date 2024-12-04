@@ -4,7 +4,6 @@ const path = require('path');
 module.exports = {
     entry: {
         betterMyEmailPlugin: './src/client/betterMyEmailPlugin.ts',
-        background: './background.js'
     },
     module: {
         rules: [
