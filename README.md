@@ -30,12 +30,11 @@ Re-upload to the Chrome Web Store.
 
 OR
 
-```
 [Go to the Chrome Developer Dashboard Console](https://chrome.google.com/webstore/devconsole/95ee1d1b-8f50-43a2-8a0f-a23dc06fc548)
 
 Click on the Better My Email Item. 
-Go to "Package" and Click on "Roll back to Previous Version"
-```
+Go to "Package" and Click on the button "Roll back to Previous Version"
+
 
 ## 2. Installations
 
