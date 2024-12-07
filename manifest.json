@@ -5,8 +5,7 @@
     "description": "Extension will evaluate/suggest edits on the basis of Tone, Grammar, Conciseness, Clarity, Personalization,Formatting & Impact",
     "permissions": [
         "storage",
-        "tabs",
-        "scripting"
+        "tabs"
     ],
     "host_permissions": [
         "*://mail.google.com/*"
