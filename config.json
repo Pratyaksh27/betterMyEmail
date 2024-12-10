@@ -1,3 +1,4 @@
 {
-    "analysis_URL": "https://new-email-tone-check-app-2d7fd1f02c8b.herokuapp.com/analyzeEmail"
+    "analysis_URL": "https://new-email-tone-check-app-2d7fd1f02c8b.herokuapp.com/analyzeEmail",
+    "database_URL": "mongodb://localhost:27017/EmailToneCheck"
 }
