@@ -1,7 +1,13 @@
 {
     "manifest_version": 3,
     "name": "Better My Email",
-    "version": "2.0",
+    "version": "2.1",
+    "web_accessible_resources": [
+        {
+            "resources": ["dist/client/feedbackForm.html"],
+            "matches": ["*://mail.google.com/*"]
+        }
+    ],
     "description": "Extension will evaluate/suggest edits on the basis of Tone, Grammar, Conciseness, Clarity, Personalization,Formatting & Impact",
     "permissions": [
         "storage",
