@@ -1,7 +1,7 @@
 //import { div } from 'react';
 //import { send } from "process";
-import { FeedbackManager } from "./feedback";
-
+import { UsageTrackingManager } from "./usageTracking";
+import { FeedbackUI } from "./feedbackUI";
 /*
 End User can evaluate an email they’ve written to “Better my email” before sending. 
 The Plugin will “evaluate” the email and give personalized recommendations. 
@@ -10,6 +10,12 @@ Users can Accept/Discard the suggestion
 USer Clicks on Send Button. He is taken to a Plugin asking if he wishes to Better their email.
 */
 console.log('betterMyEmailPlugin.js - Start');
+
+// Initialize the FeedbackUI
+const feedbackUI = new FeedbackUI();
+feedbackUI.injectFeedbackForm().then(() => {
+    console.log('Feedback Form injected successfully');
+});
 
 function getConfigs(): Promise<any> {
     return new Promise((resolve, reject) => {
@@ -27,7 +33,7 @@ function getConfigs(): Promise<any> {
 
 async function fetchBetterMyEmailAPI(event: Event) {
     // Increment the Usage count in the Feedback Manager
-    FeedbackManager.incrementUsage();
+    UsageTrackingManager.incrementUsage();
     console.log('betterMyEmailPlugin.ts: Inside fetchBetterMyEmailAPI');
     // Show the spinner
     document.getElementById('betterMyEmailSpinner')!.style.display = 'block';
@@ -90,11 +96,11 @@ async function fetchBetterMyEmailAPI(event: Event) {
         console.error('betterMyEmailPlugin.ts: Error in Better my Email Analysis: ', error);
     }
     // Should we show the Feedback Form
-    if (FeedbackManager.shouldShowFeedbackPopup()) {
+    /* if (UsageTrackingManager.shouldShowFeedbackPopup()) {
         console.log('betterMyEmailPlugin.ts: Showing Feedback Form');
     } else {
         console.log('betterMyEmailPlugin.ts: Not showing Feedback Form');
-    }
+    }*/
 } 
 
 function createBetterMyEmailButton() {
@@ -158,15 +164,17 @@ function showBetterMyEmailResultDialog(data:{ recommendedEmail: string; rational
 
     acceptButton.onclick = function() {
         // Check If Feedback form should be shown
-        if (FeedbackManager.shouldShowFeedbackPopup()) {
+        if (UsageTrackingManager.shouldShowFeedbackPopup()) {
             console.log('betterMyEmailPlugin.ts Accept Button Clicked: Showing Feedback Form');
+            feedbackUI.showFeedbackForm();
         }
         replaceEmailContent(data.recommendedEmail);
         dialog.close();
     };
     discardButton.onclick = function() {
-        if (FeedbackManager.shouldShowFeedbackPopup()) {
+        if (UsageTrackingManager.shouldShowFeedbackPopup()) {
             console.log('betterMyEmailPlugin.ts Discard Button Clicked: Showing Feedback Form');
+            feedbackUI.showFeedbackForm();
         }
         dialog.close();
     };

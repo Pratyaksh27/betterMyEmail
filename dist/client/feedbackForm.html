@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>    
+    <style>
+        .feedback-container {
+            position: fixed !important;
+            bottom: 20px !important;
+            right: 20px !important;
+            width: 300px;
+            background-color: #fff;
+            background: #fff;
+            border: 5px solid #000;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+            font-family: sans-serif;
+            z-index: 9999;
+            padding: 16px;
+        }
+
+        .feedback-header {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .feedback-emojis {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .feedback-emojis span {
+            cursor: pointer;
+            font-size: 24px;
+        }
+
+        .feedback-question {
+            margin-bottom: 8px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 60px;
+            padding: 8px;
+            box-sizing: border-box;
+            margin-bottom: 12px;
+        }
+
+        .feedback-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .feedback-actions button {
+            background-color: #1a73e8;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .feedback-actions button:hover {
+            background-color: #155bb5;
+        }
+
+        .feedback-close {
+            float: right;
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            color: #ff0000;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="feedback-container" id="feedbackFormContainer" style="display: none;">
+        <button class="feedback-close" id="feedbackCloseBtn" title="Close">✕</button>
+        <div class="feedback-header">How did we do today?</div>
+        <div class="feedback-emojis" id="feedbackEmojiContainer">
+            <span data-value="5" title="Very Happy">😁</span>
+            <span data-value="4" title="Happy">🙂</span>
+            <span data-value="3" title="Neutral">😐</span>
+            <span data-value="2" title="Slightly Sad">😕</span>
+            <span data-value="1" title="Very Sad">😞</span>
+        </div>
+        <div class="feedback-question">What can we improve? Any new features you would like to see?</div>
+        <textarea id="feedbackText" placeholder="Your suggestions..."></textarea>
+        <div class="feedback-actions">
+            <button id="feedbackSubmitBtn">Submit</button>
+        </div>
+    </div>
+</body>
+</html>
