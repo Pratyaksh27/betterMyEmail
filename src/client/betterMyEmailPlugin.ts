@@ -1,7 +1,7 @@
 //import { div } from 'react';
 //import { send } from "process";
-import { UsageTrackingManager } from "./usageTracking";
-import { FeedbackUI } from "./feedbackUI";
+import { UsageTrackingManager } from "./user_feedback/usageTracking";
+import { FeedbackUI } from "./user_feedback/feedbackUI";
 /*
 End User can evaluate an email they’ve written to “Better my email” before sending. 
 The Plugin will “evaluate” the email and give personalized recommendations. 

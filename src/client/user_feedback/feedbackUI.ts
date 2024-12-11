@@ -12,7 +12,7 @@ export class FeedbackUI {
 
     public async injectFeedbackForm(): Promise<void> {
         try {
-            const response = await fetch(chrome.runtime.getURL('dist/client/feedbackForm.html'));
+            const response = await fetch(chrome.runtime.getURL('dist/client/user_feedback/feedbackForm.html'));
             const html = await response.text();
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = html.trim();
@@ -79,7 +79,7 @@ export class FeedbackUI {
         const feedbackForm = document.getElementById('feedbackFormContainer');
         if (feedbackForm) {
             console.log('Feedback UI : Feedback Form Found');
-            feedbackForm.style.display = 'block';
+            // feedbackForm.style.display = 'block';
         }
     }
 
