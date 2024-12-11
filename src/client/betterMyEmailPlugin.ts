@@ -2,6 +2,7 @@
 //import { send } from "process";
 import { UsageTrackingManager } from "./user_feedback/usageTracking";
 import { FeedbackUI } from "./user_feedback/feedbackUI";
+import { v4 as uuidv4 } from 'uuid';
 /*
 End User can evaluate an email they’ve written to “Better my email” before sending. 
 The Plugin will “evaluate” the email and give personalized recommendations. 
@@ -16,6 +17,22 @@ const feedbackUI = new FeedbackUI();
 feedbackUI.injectFeedbackForm().then(() => {
     console.log('Feedback Form injected successfully');
 });
+
+/*
+# Ensure the user has a UUID stored in the local storage
+# If not, generate a new UUID and store it in the local storage
+*/
+function ensureUUID() {
+    let uuid = localStorage.getItem('userUUID');
+    if (!uuid || uuid === null || uuid === 'null' || uuid === 'undefined' || uuid === '') {
+        uuid = uuidv4();
+        if (uuid !== null){
+            localStorage.setItem('userUUID', uuid.toString());
+        }      
+    } else {
+        console.log('Existing User with UUID: ', uuid);
+    }
+}
 
 function getConfigs(): Promise<any> {
     return new Promise((resolve, reject) => {
@@ -217,6 +234,8 @@ function getSpinnerHTML() {
 (function() {
     console.log('Script executing immediately after load');
     let sendButtonProcessed = false;
+    // Ensure the user has a UUID stored in the local storage
+    ensureUUID();
 
     const observer = new MutationObserver(mutations => {
         mutations.forEach(mutation => {
