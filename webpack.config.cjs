@@ -25,7 +25,9 @@ module.exports = {
     output: {
         filename: '[name].js',
         path: path.resolve(__dirname, 'dist/client'),
-        clean: true,
+        clean: {
+            keep: /user_feedback/,
+        },
     },
     mode: 'production'
 };
