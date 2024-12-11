@@ -54,6 +54,8 @@ npm install --save-dev @types/body-parser @types/axios @types/cors
 npm install open
 npm install --save-dev @types/chrome
 npm install dotenv
+npm install --save-dev @types/pg
+npm install --save-dev @types/uuid
 ```
 
 ### Build the Project
