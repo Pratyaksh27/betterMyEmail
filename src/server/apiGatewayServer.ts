@@ -1,17 +1,10 @@
-// require('dotenv').config();
-// import dotenv from 'dotenv';
-
+import pool from './db';
 import express from 'express';
 import { Request, Response } from 'express';
 import axios from 'axios';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-// import { Configuration, OpenAI } from 'openai';
-//import Configuration from 'openai';
-//import OpenAIApi from 'openai';
-//import OpenAI from 'openai';
 import { OpenAI } from 'openai';
-// import Configuration from 'openai';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -47,7 +40,13 @@ app.get('/test-openai', async (req: Request, res: Response) => {
     }
 });
 
-
+/*
+***  Analyze Email Endpoint: Receives an email content and analyzes it using OpenAI's GPT-4 model.
+***  The email content is sent to the GPT-4 model for analysis along with Prompt messages.
+***  The response is a JSON object containing the analysis result. 
+***  The analysis result is the improved email content along with the rationale for the improvements made.
+***  The response is sent back to the client (extension).
+*/
 app.post('/analyzeEmail', async (req: Request, res: Response) => {
     console.log('API Gateway Server: Analyzing Email Content...');
     const emailContent = req.body.emailContent;
@@ -103,6 +102,32 @@ app.post('/analyzeEmail', async (req: Request, res: Response) => {
         console.error('API Gateway Server: Error in Email analysis: ', error);
        return res.status(500).send({ message: 'Failed to analyze Email' ,error: error });
     }
+});
+
+/*
+*** submit_feedback Endpoint: Receives feedback from the user and stores it in the database. 
+*/
+app.post('/submitFeedback', async (req: Request, res: Response) => {
+    const { uuid, rating, feedback } = req.body;
+    if (!uuid || !rating || !feedback) {
+        return res.status(400).send({ message: 'Missing Required Fields for submitting feedback' });
+    }
+    try {
+        const submit_feedback_query = `
+            INSERT INTO feedback (uuid, rating, feedback, created_at)
+            VALUES ($1, $2, $3, NOW())
+            ON CONFLICT (uuid) DO UPDATE SET rating = $2, feedback = $3, created_at = NOW()
+            RETURNING *;`;
+        const client = await pool.connect();
+        const result = await client.query(submit_feedback_query, [uuid, rating, feedback]);
+        client.release();
+        console.log('API Gateway Server: Feedback Submitted Successfully: ', result.rows[0]);
+        return res.json(result.rows[0]);
+    } catch (error) {
+        console.error('API Gateway Server: Error in submitting feedback: ', error);
+        return res.status(500).send({ message: 'Failed to submit feedback' });
+    }
+    
 });
 
 app.listen(port, () => {

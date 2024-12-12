@@ -34,7 +34,7 @@ function ensureUUID() {
     }
 }
 
-function getConfigs(): Promise<any> {
+export function getConfigs(): Promise<any> {
     return new Promise((resolve, reject) => {
         chrome.storage.sync.get(['config'], function(result: any) {
             if (result.config) {

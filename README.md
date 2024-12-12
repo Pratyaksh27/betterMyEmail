@@ -54,6 +54,7 @@ npm install --save-dev @types/body-parser @types/axios @types/cors
 npm install open
 npm install --save-dev @types/chrome
 npm install dotenv
+brew install postgresql
 npm install --save-dev @types/pg
 npm install --save-dev @types/uuid
 ```
@@ -92,6 +93,12 @@ heroku logs --tail
 To list apps:
 ```bash
 heroku apps
+```
+
+### Connect to Database
+To Connect to Database:
+```bash
+heroku pg:psql -a new-email-tone-check-app
 ```
 
 ## 4. Uploading Extension to the Chrome Web Store
