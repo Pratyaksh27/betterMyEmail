@@ -114,7 +114,7 @@ export class FeedbackUI {
             rating: rating,
             feedback: feedback
         };
-        console.log('Feedback Payload:', payload);
+        console.log('Feedback Payload is :', payload);
         try {
             const configs = await getConfigs();
             const submit_feedback_url = configs.app_URL; //  + '/submitFeedback';

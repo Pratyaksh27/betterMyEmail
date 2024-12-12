@@ -108,7 +108,9 @@ app.post('/analyzeEmail', async (req: Request, res: Response) => {
 *** submit_feedback Endpoint: Receives feedback from the user and stores it in the database. 
 */
 app.post('/submitFeedback', async (req: Request, res: Response) => {
+    console.log('API Gateway Server: Submit Feedback API Endpoint');
     const { uuid, rating, feedback } = req.body;
+    console.log('API Gateway Server: Feedback Data: ', { uuid, rating, feedback });
     if (!uuid || !rating || !feedback) {
         return res.status(400).send({ message: 'Missing Required Fields for submitting feedback' });
     }
