@@ -95,6 +95,11 @@ To list apps:
 heroku apps
 ```
 
+To Restart:
+```bash
+heroku restart -a new-email-tone-check-app
+``` 
+
 ### Connect to Database
 To Connect to Database:
 ```bash

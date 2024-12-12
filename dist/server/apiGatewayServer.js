@@ -132,6 +132,12 @@ app.post('/submitFeedback', (req, res) => __awaiter(void 0, void 0, void 0, func
         return res.status(500).send({ message: 'Failed to submit feedback' });
     }
 }));
+app.get('/debug/routes', (req, res) => {
+    const routes = app._router.stack
+        .filter((layer) => layer.route) // Only include routes
+        .map((layer) => { var _a; return (_a = layer.route) === null || _a === void 0 ? void 0 : _a.path; }); // Extract route paths
+    res.json(routes);
+});
 app.listen(port, () => {
     console.log(`API Gateway Server listening at ${api_gateway_server}:${port}`);
 });

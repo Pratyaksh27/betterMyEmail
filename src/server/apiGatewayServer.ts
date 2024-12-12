@@ -130,6 +130,19 @@ app.post('/submitFeedback', async (req: Request, res: Response) => {
     
 });
 
+type ExpressLayer = {
+    route?: { path: string }; // Define only what's needed
+    name?: string;
+    handle?: Function;
+};
+
+app.get('/debug/routes', (req, res) => {
+    const routes = app._router.stack
+        .filter((layer: ExpressLayer) => layer.route) // Only include routes
+        .map((layer: ExpressLayer) => layer.route?.path); // Extract route paths
+    res.json(routes);
+});
+
 
 app.listen(port, () => {
     console.log(`API Gateway Server listening at ${api_gateway_server}:${port}`);
