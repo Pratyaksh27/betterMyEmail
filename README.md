@@ -81,6 +81,7 @@ heroku git:remote -a new-email-tone-check-app (Name of the app in Heroku)
 Push to Heroku:
 ```bash
 git push heroku master
+git push heroku your_local_branch_name:master
 ```
 
 ### Check Logs

@@ -98,8 +98,9 @@ export class FeedbackUI {
     private async submitFeedback(rating: number | null, feedback: string) {
         const userUUID = localStorage.getItem('userUUID');
         if (!userUUID) {
+            console.log('User UUID not found in localStorage. Will NOT submit feedback.');
             console.error('User UUID not found in localStorage. Will NOT submit feedback.');
-            return;
+            return ;
         }
         if (!rating) {
             rating = -1;
@@ -113,6 +114,7 @@ export class FeedbackUI {
             rating: rating,
             feedback: feedback
         };
+        console.log('Feedback Payload:', payload);
         try {
             const configs = await getConfigs();
             const submit_feedback_url = configs.app_URL; //  + '/submitFeedback';
