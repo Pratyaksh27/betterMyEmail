@@ -130,6 +130,7 @@ export class FeedbackUI {
             });
             if (response.ok) {
                 console.log('Feedback submitted successfully.');
+                localStorage.setItem('lastFeedbackGiven', 'true');
             }
         } catch (error) {
             console.error('Error submitting feedback:', error);
