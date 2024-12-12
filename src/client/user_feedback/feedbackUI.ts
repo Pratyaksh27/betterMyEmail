@@ -115,7 +115,7 @@ export class FeedbackUI {
         };
         try {
             const configs = await getConfigs();
-            const submit_feedback_url = configs.app_URL + '/submitFeedback';
+            const submit_feedback_url = configs.app_URL; //  + '/submitFeedback';
             console.log('Submitting feedback to:', submit_feedback_url);
             if (!submit_feedback_url) {
                 console.error('Feedback URL not found in configs. Will NOT submit feedback.');
