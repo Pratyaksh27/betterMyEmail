@@ -54,6 +54,7 @@ npm install --save-dev @types/body-parser @types/axios @types/cors
 npm install open
 npm install --save-dev @types/chrome
 npm install dotenv
+brew install postgresql
 npm install --save-dev @types/pg
 npm install --save-dev @types/uuid
 ```
@@ -80,6 +81,7 @@ heroku git:remote -a new-email-tone-check-app (Name of the app in Heroku)
 Push to Heroku:
 ```bash
 git push heroku master
+git push heroku your_local_branch_name:master
 ```
 
 ### Check Logs
@@ -92,6 +94,17 @@ heroku logs --tail
 To list apps:
 ```bash
 heroku apps
+```
+
+To Restart:
+```bash
+heroku restart -a new-email-tone-check-app
+``` 
+
+### Connect to Database
+To Connect to Database:
+```bash
+heroku pg:psql -a new-email-tone-check-app
 ```
 
 ## 4. Uploading Extension to the Chrome Web Store

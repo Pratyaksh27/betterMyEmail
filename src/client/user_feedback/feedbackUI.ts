@@ -2,6 +2,7 @@
 // This file contains the FeedbackUI class that is responsible for showing and hiding the feedback form.
 // It also handles the submission of feedback.
 // This class will be used in the content script to show the feedback form to the user.
+import { getConfigs } from '../betterMyEmailPlugin';
 
 export class FeedbackUI {
     private selectedRating: number | null = null;
@@ -79,7 +80,7 @@ export class FeedbackUI {
         const feedbackForm = document.getElementById('feedbackFormContainer');
         if (feedbackForm) {
             console.log('Feedback UI : Feedback Form Found');
-            // feedbackForm.style.display = 'block';
+            feedbackForm.style.display = 'block';
         }
     }
 
@@ -94,8 +95,46 @@ export class FeedbackUI {
         if (feedbackText) feedbackText.value = '';
     }
 
-    private submitFeedback(rating: number | null, feedbackText: string) {
-        console.log('Submitted Feedback:', { rating, feedbackText });
+    private async submitFeedback(rating: number | null, feedback: string) {
+        const userUUID = localStorage.getItem('userUUID');
+        if (!userUUID) {
+            console.log('User UUID not found in localStorage. Will NOT submit feedback.');
+            console.error('User UUID not found in localStorage. Will NOT submit feedback.');
+            return ;
+        }
+        if (!rating) {
+            rating = -1;
+        }
+        if (!feedback) {
+            feedback = 'Not Given by User. Only Rating provided';
+        }
+        console.log('Submitting Feedback:', { rating, feedbackText: feedback });
+        const payload = {
+            uuid: userUUID, // Explicit mapping since
+            rating: rating,
+            feedback: feedback
+        };
+        console.log('Feedback Payload is :', payload);
+        try {
+            const configs = await getConfigs();
+            const submit_feedback_url = configs.app_URL + '/submitFeedback';
+            console.log('Submitting feedback to:', submit_feedback_url);
+            if (!submit_feedback_url) {
+                console.error('Feedback URL not found in configs. Will NOT submit feedback.');
+                return;
+            }
+            const response = await fetch(submit_feedback_url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (response.ok) {
+                console.log('Feedback submitted successfully.');
+                localStorage.setItem('lastFeedbackGiven', 'true');
+            }
+        } catch (error) {
+            console.error('Error submitting feedback:', error);
+        }
 
         // TODO: Implement logic to send feedback to your database
         // This might involve calling some API endpoint with `rating` and `feedbackText`.
