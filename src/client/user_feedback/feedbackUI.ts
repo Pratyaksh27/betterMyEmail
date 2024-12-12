@@ -110,7 +110,7 @@ export class FeedbackUI {
         }
         console.log('Submitting Feedback:', { rating, feedbackText: feedback });
         const payload = {
-            id: userUUID, // Explicit mapping since
+            uuid: userUUID, // Explicit mapping since
             rating: rating,
             feedback: feedback
         };

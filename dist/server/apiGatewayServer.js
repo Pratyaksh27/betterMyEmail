@@ -119,7 +119,7 @@ app.post('/submitFeedback', (req, res) => __awaiter(void 0, void 0, void 0, func
     }
     try {
         const submit_feedback_query = `
-            INSERT INTO feedback (uuid, rating, feedback, created_at)
+            INSERT INTO user_feedback (uuid, rating, feedback, created_at)
             VALUES ($1, $2, $3, NOW())
             ON CONFLICT (uuid) DO UPDATE SET rating = $2, feedback = $3, created_at = NOW()
             RETURNING *;`;
