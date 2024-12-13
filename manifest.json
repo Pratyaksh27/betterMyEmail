@@ -8,7 +8,7 @@
             "matches": ["*://mail.google.com/*"]
         }
     ],
-    "description": "Extension will evaluate/suggest edits on the basis of Tone, Grammar, Conciseness, Clarity, Personalization,Formatting & Impact",
+    "description": "AI rephrases email for Better Tone, Grammar, Conciseness, Clarity, Personalization,Formatting & Impact",
     "permissions": [
         "storage",
         "tabs"
