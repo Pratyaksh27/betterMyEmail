@@ -80,7 +80,9 @@ app.post('/analyzeEmail', (req, res) => __awaiter(void 0, void 0, void 0, functi
                     }
                     \`\`\`
                     
-                    Ensure that the JSON is valid and properly formatted. Do not include any additional text outside of the JSON block.`
+                    Ensure that the JSON is valid and properly formatted. Do not include any additional text outside of the JSON block.
+                    Plus there is no need to add the "Subject" line in your response. Just the email content is enough.
+                    If the Receipient or Sender name is not present, do NOT add [Name] in the email content for either of them.`
                 },
                 {
                     role: "system",
@@ -93,6 +95,10 @@ app.post('/analyzeEmail', (req, res) => __awaiter(void 0, void 0, void 0, functi
                 {
                     role: "assistant",
                     content: "Remember, only output the JSON response in the specified format without any additional text."
+                },
+                {
+                    role: "assistant",
+                    content: "Remember, DONT give Subject line. Dont add [Name] if recipient or sender name is not available."
                 }
             ],
             max_tokens: 1000,
