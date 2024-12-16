@@ -57,6 +57,7 @@ npm install dotenv
 brew install postgresql
 npm install --save-dev @types/pg
 npm install --save-dev @types/uuid
+npm install --save-dev copyfiles
 ```
 
 ### Build the Project
