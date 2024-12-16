@@ -6,8 +6,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:client": "webpack --config webpack.config.cjs",
     "build:server": "tsc -p tsconfig.server.json",
-    "copy:feedbackForm": "cp src/client/user_feedback/feedbackForm.html dist/client/user_feedback/feedbackForm.html",
-    "build": "npm run build:client && npm run build:server && npm run copy:feedbackForm",
+    "copy:html": "copyfiles -u 2 src/client/*/*.html dist/client/",
+    "build": "npm run build:client && npm run build:server && npm run copy:html",
     "start": "node dist/server/apiGatewayServer.js"
   },
   "keywords": [],
@@ -23,6 +23,7 @@
     "@types/node": "^20.12.11",
     "@types/pg": "^8.11.10",
     "@types/uuid": "^10.0.0",
+    "copyfiles": "^2.4.1",
     "ts-loader": "^9.5.1",
     "webpack": "^5.96.1",
     "webpack-cli": "^5.1.4"
