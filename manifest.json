@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Better My Email",
-    "version": "2.35",
+    "version": "2.364",
     "web_accessible_resources": [
         {
             "resources": [
