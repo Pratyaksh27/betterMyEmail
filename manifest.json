@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Better My Email",
-    "version": "2.37",
+    "version": "2.371",
     "web_accessible_resources": [
         {
             "resources": [
@@ -11,7 +11,7 @@
             "matches": ["*://mail.google.com/*"]
         }
     ],
-    "description": "AI rephrases email for Better Tone, Grammar, Conciseness, Clarity, Personalization,Formatting & Impact",
+    "description": "AI powered Email Productivity Tool. Automatically rephrases email for Better Tone, Grammar, Conciseness, Clarity, Personalization,Formatting & Impact",
     "permissions": [
         "storage",
         "tabs"
