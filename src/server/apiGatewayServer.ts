@@ -139,16 +139,16 @@ app.post('/submitFeedback', async (req: Request, res: Response) => {
 });
 
 app.post('/submitUsageStats', async (req: Request, res: Response) => {
-    const { uuid, total_uses, uses_since_last_feedback } = req.body;
+    const { uuid, total_uses, uses_since_last_feedback, recommendations_accepted, recommendations_discarded } = req.body;
     console.log('API Gateway Server: Usage Stats Data: ', { uuid, total_uses, uses_since_last_feedback });
     if (!uuid || total_uses == null || uses_since_last_feedback == null) {
          return res.status(400).json({ error: 'SUage Stats Update: Missing required fields. Update failed' });  
     }
     try {
         const submit_usage_stats_query = `
-            INSERT INTO usage_statistics (uuid, total_uses, uses_since_last_feedback, last_usage_time)
-            VALUES ($1, $2, $3, NOW())
-            ON CONFLICT (uuid) DO UPDATE SET total_uses = $2, uses_since_last_feedback = $3, last_usage_time = NOW()
+            INSERT INTO usage_statistics (uuid, total_uses, uses_since_last_feedback, last_usage_time, recommendations_accepted, recommendations_discarded)
+            VALUES ($1, $2, $3, NOW(), $4, $5)
+            ON CONFLICT (uuid) DO UPDATE SET total_uses = $2, uses_since_last_feedback = $3, last_usage_time = NOW(), recommendations_accepted = $4, recommendations_discarded = $5
             RETURNING *;`;
         const client = await pool.connect();
         const result = await client.query(submit_usage_stats_query, [uuid, total_uses, uses_since_last_feedback]);

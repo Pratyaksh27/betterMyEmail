@@ -1,5 +1,6 @@
 import { UsageTrackingManager } from "../user_feedback/usageTracking";
 import { FeedbackUI } from "../user_feedback/feedbackUI";
+import { getConfigs } from '../betterMyEmailPlugin';
 
 
 // Initialize the FeedbackUI
@@ -64,6 +65,8 @@ export function showBetterMyEmailResultDialog(data: { recommendedEmail: string; 
                 }
                 replaceEmailContent(data.recommendedEmail);
                 dialog.close();
+                UsageTrackingManager.incrementUsage(true);
+                updateUsageCountinDB();
             };
 
             // Discard Button Logic
@@ -73,6 +76,8 @@ export function showBetterMyEmailResultDialog(data: { recommendedEmail: string; 
                     feedbackUI.showFeedbackForm();
                 }
                 dialog.close();
+                UsageTrackingManager.incrementUsage(false);
+                updateUsageCountinDB();
             };
 
             // Optional: Log when the dialog is closed
@@ -90,5 +95,38 @@ function replaceEmailContent(recommendedEmailContent: string) {
         emailContentElement.innerHTML = recommendedEmailContent.replace(/\n/g, '<br>');
     } else {
         console.error('Email Analysis Result Dialog:: Email Content Element not found');
+    }
+}
+
+async function updateUsageCountinDB() {
+    console.log('emailAnalysisResultDialog.ts: Inside updateUsageCount');
+    let total_uses = localStorage.getItem(UsageTrackingManager.totalUsesKey);
+    let uses_since_last_feedback = localStorage.getItem(UsageTrackingManager.usesSinceLastFeedbackKey);
+    let uuid = localStorage.getItem('userUUID');
+    let recommendations_accepted = localStorage.getItem(UsageTrackingManager.recommendationsAcceptedKey);
+    let recommendations_discarded = localStorage.getItem(UsageTrackingManager.recommendationsDiscardedKey);
+
+    console.log('emailAnalysisResultDialog.ts: Usage Stats: ', { uuid,total_uses,uses_since_last_feedback,recommendations_accepted,recommendations_discarded });
+    const payload = {
+        uuid: uuid,
+        total_uses: total_uses,
+        uses_since_last_feedback: uses_since_last_feedback,
+        recommendations_accepted: recommendations_accepted,
+        recommendations_discarded: recommendations_discarded
+    };
+    try {
+        const configs = await getConfigs();
+        const submit_usage_url = configs.app_URL + '/submitUsageStats';
+        console.log('emailAnalysisResultDialog.ts: Updating Usage Stats to:', submit_usage_url);
+        const response = await fetch(submit_usage_url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (response.ok) {
+            console.log('Usage Stats submitted successfully.');
+        }
+    } catch (error) {
+        console.error('Error submitting usage stats:', error);
     }
 }

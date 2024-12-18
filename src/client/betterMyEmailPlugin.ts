@@ -1,6 +1,3 @@
-//import { div } from 'react';
-//import { send } from "process";
-import { UsageTrackingManager } from "./user_feedback/usageTracking";
 import { v4 as uuidv4 } from 'uuid';
 import { showBetterMyEmailResultDialog } from "./email_analysis/emailAnalysisResultDialog";
 import { getSpinnerHTML } from "./email_analysis/spinner";
@@ -72,10 +69,6 @@ export function getConfigs(): Promise<any> {
 }
 
 async function fetchBetterMyEmailAPI(event: Event) {
-    // Increment the Usage count in the Feedback Manager
-    UsageTrackingManager.incrementUsage();
-    // Update the Usage Stats
-    updateUsageCount();
     console.log('betterMyEmailPlugin.ts: Inside fetchBetterMyEmailAPI');
     // Show the spinner
     document.getElementById('betterMyEmailSpinner')!.style.display = 'block';
@@ -138,34 +131,6 @@ async function fetchBetterMyEmailAPI(event: Event) {
         console.error('betterMyEmailPlugin.ts: Error in Better my Email Analysis: ', error);
     }
 } 
-
-async function updateUsageCount() {
-    console.log('betterMyEmailPlugin.ts: Inside updateUsageCount');
-    let total_uses = localStorage.getItem(UsageTrackingManager.totalUsesKey);
-    let uses_since_last_feedback = localStorage.getItem(UsageTrackingManager.usesSinceLastFeedbackKey);
-    let uuid = localStorage.getItem('userUUID');
-    console.log('betterMyEmailPlugin.ts: Usage Stats: ', { total_uses, uses_since_last_feedback });
-    const payload = {
-        uuid: uuid,
-        total_uses: total_uses,
-        uses_since_last_feedback: uses_since_last_feedback
-    };
-    try {
-        const configs = await getConfigs();
-        const submit_usage_url = configs.app_URL + '/submitUsageStats';
-        console.log('betterMyEmailPlugin.ts: Updating Usage Stats to:', submit_usage_url);
-        const response = await fetch(submit_usage_url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        if (response.ok) {
-            console.log('Usage Stats submitted successfully.');
-        }
-    } catch (error) {
-        console.error('Error submitting usage stats:', error);
-    }
-}
 
 function createBetterMyEmailButton() {
     const button = document.createElement('button');
