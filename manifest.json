@@ -11,7 +11,7 @@
             "matches": ["*://mail.google.com/*"]
         }
     ],
-    "description": "AI powered Email Productivity Tool. Automatically rephrases email for Better Tone, Grammar, Conciseness, Clarity, Personalization,Formatting & Impact",
+    "description": "AI powered Email Productivity Tool. Automatically rephrases email for Better Tone,Grammar,Conciseness,Clarity,Formatting & Impact",
     "permissions": [
         "storage",
         "tabs"
