@@ -140,6 +140,29 @@ app.post('/submitFeedback', (req, res) => __awaiter(void 0, void 0, void 0, func
         return res.status(500).send({ message: 'Failed to submit feedback' });
     }
 }));
+app.post('/submitUsageStats', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { uuid, total_uses, uses_since_last_feedback } = req.body;
+    console.log('API Gateway Server: Usage Stats Data: ', { uuid, total_uses, uses_since_last_feedback });
+    if (!uuid || total_uses == null || uses_since_last_feedback == null) {
+        return res.status(400).json({ error: 'SUage Stats Update: Missing required fields. Update failed' });
+    }
+    try {
+        const submit_usage_stats_query = `
+            INSERT INTO usage_statistics (uuid, total_uses, uses_since_last_feedback, last_usage_time)
+            VALUES ($1, $2, $3, NOW())
+            ON CONFLICT (uuid) DO UPDATE SET total_uses = $2, uses_since_last_feedback = $3, last_usage_time = NOW()
+            RETURNING *;`;
+        const client = yield db_1.default.connect();
+        const result = yield client.query(submit_usage_stats_query, [uuid, total_uses, uses_since_last_feedback]);
+        client.release();
+        console.log('API Gateway Server: Usage Stats Submitted Successfully: ', result.rows[0]);
+        return res.json(result.rows[0]);
+    }
+    catch (error) {
+        console.error('API Gateway Server: Error in submitting usage stats: ', error);
+        return res.status(500).send({ message: 'Failed to submit usage stats' });
+    }
+}));
 app.get('/debug/routes', (req, res) => {
     const routes = app._router.stack
         .filter((layer) => layer.route) // Only include routes
