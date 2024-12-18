@@ -138,6 +138,29 @@ app.post('/submitFeedback', async (req: Request, res: Response) => {
     
 });
 
+app.post('/submitUsageStats', async (req: Request, res: Response) => {
+    const { uuid, total_uses, uses_since_last_feedback } = req.body;
+    console.log('API Gateway Server: Usage Stats Data: ', { uuid, total_uses, uses_since_last_feedback });
+    if (!uuid || total_uses == null || uses_since_last_feedback == null) {
+         return res.status(400).json({ error: 'SUage Stats Update: Missing required fields. Update failed' });  
+    }
+    try {
+        const submit_usage_stats_query = `
+            INSERT INTO usage_statistics (uuid, total_uses, uses_since_last_feedback, last_usage_time)
+            VALUES ($1, $2, $3, NOW())
+            ON CONFLICT (uuid) DO UPDATE SET total_uses = $2, uses_since_last_feedback = $3, last_usage_time = NOW()
+            RETURNING *;`;
+        const client = await pool.connect();
+        const result = await client.query(submit_usage_stats_query, [uuid, total_uses, uses_since_last_feedback]);
+        client.release();
+        console.log('API Gateway Server: Usage Stats Submitted Successfully: ', result.rows[0]);
+        return res.json(result.rows[0]);
+    } catch (error) {
+        console.error('API Gateway Server: Error in submitting usage stats: ', error);
+        return res.status(500).send({ message: 'Failed to submit usage stats' });
+    }
+});
+
 type ExpressLayer = {
     route?: { path: string }; // Define only what's needed
     name?: string;
