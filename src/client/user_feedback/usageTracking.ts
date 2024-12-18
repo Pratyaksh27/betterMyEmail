@@ -3,13 +3,17 @@ export class UsageTrackingManager {
     static lastFeedbackTimeKey = 'lastFeedbackTime';
     static lastFeedbackGivenKey = 'lastFeedbackGiven';
     static usesSinceLastFeedbackKey = 'usesSinceLastFeedback';
+    static recommendationsAcceptedKey = 'recommendationsAccepted';
+    static recommendationsDiscardedKey = 'recommendationsDiscarded';
 
     static getFeedbackData() {
         return {
             totalUses: localStorage.getItem(UsageTrackingManager.totalUsesKey),
             lastFeedbackTime: localStorage.getItem(UsageTrackingManager.lastFeedbackTimeKey),
             lastFeedbackGiven: localStorage.getItem(UsageTrackingManager.lastFeedbackGivenKey),
-            usesSinceLastFeedback: localStorage.getItem(UsageTrackingManager.usesSinceLastFeedbackKey)
+            usesSinceLastFeedback: localStorage.getItem(UsageTrackingManager.usesSinceLastFeedbackKey),
+            recommendationsAccepted: localStorage.getItem(UsageTrackingManager.recommendationsAcceptedKey),
+            recommendationsDiscarded: localStorage.getItem(UsageTrackingManager.recommendationsDiscardedKey)
         };
     }
 
@@ -18,10 +22,12 @@ export class UsageTrackingManager {
         localStorage.removeItem(UsageTrackingManager.lastFeedbackTimeKey);
         localStorage.removeItem(UsageTrackingManager.lastFeedbackGivenKey);
         localStorage.removeItem(UsageTrackingManager.usesSinceLastFeedbackKey);
+        localStorage.removeItem(UsageTrackingManager.recommendationsAcceptedKey);
+        localStorage.removeItem(UsageTrackingManager.recommendationsDiscardedKey);
     }
 
     // This method should be called when the user clicks on Accept/Discard Button
-    static incrementUsage() {
+    static incrementUsage(recommendationAccepted: boolean) {
         let totalUses = parseInt(localStorage.getItem(UsageTrackingManager.totalUsesKey) || '0');
         totalUses++;
         localStorage.setItem(UsageTrackingManager.totalUsesKey, totalUses.toString());
@@ -29,6 +35,17 @@ export class UsageTrackingManager {
         let usesSinceLastFeedback = parseInt(localStorage.getItem(UsageTrackingManager.usesSinceLastFeedbackKey) || '0');
         usesSinceLastFeedback++;
         localStorage.setItem(UsageTrackingManager.usesSinceLastFeedbackKey, usesSinceLastFeedback.toString());
+
+        if(recommendationAccepted) {
+            let recommendationsAccepted = parseInt(localStorage.getItem(UsageTrackingManager.recommendationsAcceptedKey) || '0');
+            recommendationsAccepted++;
+            localStorage.setItem(UsageTrackingManager.recommendationsAcceptedKey, recommendationsAccepted.toString());
+        } else {
+            let recommendationsDiscarded = parseInt(localStorage.getItem(UsageTrackingManager.recommendationsDiscardedKey) || '0');
+            recommendationsDiscarded++;
+            localStorage.setItem(UsageTrackingManager.recommendationsDiscardedKey, recommendationsDiscarded.toString());
+        }
+        
         console.log('Incremented usage');
         console.log('Total Uses: ' + totalUses);
         console.log('Uses Since Last Feedback: ' + usesSinceLastFeedback);
