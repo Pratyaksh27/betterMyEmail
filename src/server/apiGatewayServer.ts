@@ -151,7 +151,7 @@ app.post('/submitUsageStats', async (req: Request, res: Response) => {
             ON CONFLICT (uuid) DO UPDATE SET total_uses = $2, uses_since_last_feedback = $3, last_usage_time = NOW(), recommendations_accepted = $4, recommendations_discarded = $5
             RETURNING *;`;
         const client = await pool.connect();
-        const result = await client.query(submit_usage_stats_query, [uuid, total_uses, uses_since_last_feedback]);
+        const result = await client.query(submit_usage_stats_query, [uuid, total_uses, uses_since_last_feedback, recommendations_accepted, recommendations_discarded]);
         client.release();
         console.log('API Gateway Server: Usage Stats Submitted Successfully: ', result.rows[0]);
         return res.json(result.rows[0]);
