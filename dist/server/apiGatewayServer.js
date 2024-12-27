@@ -118,16 +118,17 @@ app.post('/analyzeEmail', (req, res) => __awaiter(void 0, void 0, void 0, functi
 */
 app.post('/submitFeedback', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log('API Gateway Server: Submit Feedback API Endpoint');
-    const { uuid, rating, feedback } = req.body;
-    console.log('API Gateway Server: Feedback Data: ', { uuid, rating, feedback });
-    if (!uuid || !rating || !feedback) {
+    // const { uuid, rating, feedback } = req.body;
+    // console.log('API Gateway Server: Feedback Data: ', { uuid, rating, feedback });
+    const { uuid, type, rating = -1, feedback = 'Not Provided', uninstall_reason = 'Not Provided' } = req.body;
+    console.log('API Gateway Server: Feedback Data: ', { uuid, type, rating, feedback, uninstall_reason });
+    if (!uuid || !type || !feedback) {
         return res.status(400).send({ message: 'Missing Required Fields for submitting feedback' });
     }
     try {
         const submit_feedback_query = `
-            INSERT INTO user_feedback (uuid, rating, feedback, created_at)
-            VALUES ($1, $2, $3, NOW())
-            ON CONFLICT (uuid) DO UPDATE SET rating = $2, feedback = $3, created_at = NOW()
+            INSERT INTO user_feedback (uuid, type, rating, feedback, uninstall_reason, created_at)
+            VALUES ($1, $2, $3, $4, $5, NOW())
             RETURNING *;`;
         const client = yield db_1.default.connect();
         const result = yield client.query(submit_feedback_query, [uuid, rating, feedback]);
