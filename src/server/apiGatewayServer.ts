@@ -128,7 +128,7 @@ app.post('/submitFeedback', async (req: Request, res: Response) => {
             VALUES ($1, $2, $3, $4, $5, NOW())
             RETURNING *;`;
         const client = await pool.connect();
-        const result = await client.query(submit_feedback_query, [uuid, rating, feedback]);
+        const result = await client.query(submit_feedback_query, [uuid, type, rating, feedback, uninstall_reason]);
         client.release();
         console.log('API Gateway Server: Feedback Submitted Successfully: ', result.rows[0]);
         return res.json(result.rows[0]);

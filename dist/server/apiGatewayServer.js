@@ -131,7 +131,7 @@ app.post('/submitFeedback', (req, res) => __awaiter(void 0, void 0, void 0, func
             VALUES ($1, $2, $3, $4, $5, NOW())
             RETURNING *;`;
         const client = yield db_1.default.connect();
-        const result = yield client.query(submit_feedback_query, [uuid, rating, feedback]);
+        const result = yield client.query(submit_feedback_query, [uuid, type, rating, feedback, uninstall_reason]);
         client.release();
         console.log('API Gateway Server: Feedback Submitted Successfully: ', result.rows[0]);
         return res.json(result.rows[0]);
