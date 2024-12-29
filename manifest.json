@@ -1,14 +1,15 @@
 {
     "manifest_version": 3,
     "name": "Better My Email",
-    "version": "2.30.2",
+    "version": "2.30.21",
     "web_accessible_resources": [
         {
             "resources": [
                 "dist/client/user_feedback/feedbackForm.html",
+                "dist/client/uninstall_feedback/uninstallFeedback.html",
                 "dist/client/email_analysis/emailAnalysisResultUI.html"
             ],
-            "matches": ["*://mail.google.com/*"]
+            "matches": ["*://mail.google.com/*"]    
         }
     ],
     "description": "AI powered Email Productivity Tool. Automatically rephrases email for Better Tone,Grammar,Conciseness,Clarity,Formatting & Impact",

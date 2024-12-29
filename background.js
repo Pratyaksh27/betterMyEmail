@@ -26,6 +26,17 @@ chrome.runtime.onInstalled.addListener(() => {
     });
 });
 
+const uninstallFeedbackUrl = chrome.runtime.getURL('dist/client/uninstall_feedback/uninstallFeedback.html');
+console.log('Resolved Uninstall URL:', uninstallFeedbackUrl);
+try {
+    /*chrome.runtime.setUninstallURL(uninstallFeedbackUrl, () => {
+        console.log('background.js - Uninstall URL set to:', uninstallFeedbackUrl);
+    });*/
+    chrome.runtime.setUninstallURL('https://forms.gle/UtaPV6jiRMN9kiZv8');
+} catch (error) {
+    console.error('background.js - Error setting Uninstall URL:', error);
+}
+
 let config = {};
 let configUrl = chrome.runtime.getURL('config.json');
 fetch(configUrl)
