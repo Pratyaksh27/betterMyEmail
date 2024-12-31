@@ -56,6 +56,8 @@ export function showBetterMyEmailResultDialog(data: { recommendedEmail: string; 
 
             // Show the dialog
             dialog.showModal();
+            // Initialize the tone dropdown
+            initializeToneDropdown();
 
             // Accept Button Logic
             acceptButton.onclick = () => {
@@ -129,4 +131,24 @@ async function updateUsageCountinDB() {
     } catch (error) {
         console.error('Error submitting usage stats:', error);
     }
+}
+
+// This function initializes the tone dropdown and saves the selected tone to Local Storage
+// The tone can be Professional, Friendly etc.This is used in the Email Analysis Result Dialog
+// Its a sticky setting that persists across sessions. We use Local Storage
+function initializeToneDropdown() {
+    const toneDropdown = document.getElementById('toneDropdown') as HTMLSelectElement;
+    if (!toneDropdown) {
+        console.error('Email Analysis Result Dialog: Tone Dropdown not found');
+        return;
+    }
+    const savedTone = localStorage.getItem('selectedTone') || 'professional';
+    toneDropdown.value = savedTone;
+
+    // Save the tone to Local Storage when the user changes the selection
+    toneDropdown.addEventListener('change', (event) => {
+        const selectedTone = (event.target as HTMLSelectElement).value;
+        localStorage.setItem('selectedTone', selectedTone);
+        console.log(`Selected tone saved: ${selectedTone}`);
+    });
 }
