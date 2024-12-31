@@ -75,6 +75,10 @@ async function fetchBetterMyEmailAPI(event: Event) {
     const emailContentElement = document.querySelector('[role="textbox"][aria-label*="Message Body"]');
     const emailContent = emailContentElement ? emailContentElement.textContent : '';
     console.log('betterMyEmailPlugin.ts fetchBetterMyEmailAPI() Email Content: ', emailContent);
+
+    // Get the selected tone from Local Storage
+    const selectedTone = localStorage.getItem('selectedTone') || 'professional';
+    console.log('betterMyEmailPlugin.ts fetchBetterMyEmailAPI() Selected Tone: ', selectedTone);
     try {
         const configs = await getConfigs();
         console.log('betterMyEmailPlugin.ts fetchBetterMyEmailAPI() Configs: ', configs);
@@ -87,7 +91,10 @@ async function fetchBetterMyEmailAPI(event: Event) {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ emailContent: emailContent })
+                body: JSON.stringify({ 
+                    emailContent: emailContent,
+                    selectedTone: selectedTone,
+                })
             })
             .then(response => {
                 console.log('betterMyEmailPlugin.ts: Printing Better my Email Analysis Response: ');

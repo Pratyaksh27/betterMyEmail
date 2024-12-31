@@ -51,6 +51,8 @@ app.post('/analyzeEmail', async (req: Request, res: Response) => {
     console.log('API Gateway Server: Analyzing Email Content...');
     const emailContent = req.body.emailContent;
     console.log('API Gateway Server: Email Content found: ', emailContent);
+    const selectedTone = req.body.selectedTone;
+    console.log('API Gateway Server: Selected Tone: ', selectedTone);
     try {
         const response = await openai.chat.completions.create({
             model: 'gpt-4o',
