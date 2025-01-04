@@ -68,7 +68,7 @@ export function getConfigs(): Promise<any> {
     });
 }
 
-async function fetchBetterMyEmailAPI(event: Event) {
+export async function fetchBetterMyEmailAPI(event: Event) {
     console.log('betterMyEmailPlugin.ts: Inside fetchBetterMyEmailAPI');
     // Show the spinner
     document.getElementById('betterMyEmailSpinner')!.style.display = 'block';

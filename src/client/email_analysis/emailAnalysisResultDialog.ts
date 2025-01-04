@@ -1,9 +1,11 @@
 import { UsageTrackingManager } from "../user_feedback/usageTracking";
 import { FeedbackUI } from "../user_feedback/feedbackUI";
 import { getConfigs } from '../betterMyEmailPlugin';
+import { fetchBetterMyEmailAPI } from '../betterMyEmailPlugin';
 
 
 // Initialize the FeedbackUI
+let toneDropdownInitialized = false;
 const feedbackUI = new FeedbackUI();
 feedbackUI.injectFeedbackForm().then(() => {
     console.log('Email Analysis Result Dialog: Feedback Form injected successfully');
@@ -57,7 +59,7 @@ export function showBetterMyEmailResultDialog(data: { recommendedEmail: string; 
             // Show the dialog
             dialog.showModal();
             // Initialize the tone dropdown
-            initializeToneDropdown();
+            if (!toneDropdownInitialized){ initializeToneDropdown(); } 
 
             // Accept Button Logic
             acceptButton.onclick = () => {
@@ -142,6 +144,7 @@ function initializeToneDropdown() {
         console.error('Email Analysis Result Dialog: Tone Dropdown not found');
         return;
     }
+    toneDropdownInitialized = true;
     const savedTone = localStorage.getItem('selectedTone') || 'professional';
     toneDropdown.value = savedTone;
 
@@ -150,5 +153,21 @@ function initializeToneDropdown() {
         const selectedTone = (event.target as HTMLSelectElement).value;
         localStorage.setItem('selectedTone', selectedTone);
         console.log(`Selected tone saved: ${selectedTone}`);
+
+        const dialog = document.getElementById('betterMyEmailDialog') as HTMLDialogElement;
+        if (dialog)
+        {
+            dialog.close();
+        }
+        
+        // Automatically call the fetchBetterMyEmailAPI when tone changes
+        console.log('Calling fetchBetterMyEmailAPI due to tone change...');
+        fetchBetterMyEmailAPI(event)
+        .then(() => {
+            console.log('Email Analysis Result Tone Dropdown: fetchBetterMyEmailAPI() called successfully');
+        })
+        .catch((error) => {
+            console.error('Email Analysis Result Tone Dropdown: fetchBetterMyEmailAPI() failed:', error);
+        });
     });
 }
