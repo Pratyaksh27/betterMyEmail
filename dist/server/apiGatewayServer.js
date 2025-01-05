@@ -66,20 +66,24 @@ app.post('/analyzeEmail', (req, res) => __awaiter(void 0, void 0, void 0, functi
             model: 'gpt-4o',
             messages: [
                 {
-                    role: "user",
-                    content: emailContent
+                    role: "system",
+                    content: commonPrompts_1.commonPrompts.task
                 },
                 {
                     role: "system",
                     content: toneTemplate
                 },
                 {
+                    role: "assistant",
+                    content: commonPrompts_1.commonPrompts.jsonFormatInstruction
+                },
+                {
                     role: "system",
                     content: commonPrompts_1.commonPrompts.endOfConversation
                 },
                 {
-                    role: "assistant",
-                    content: commonPrompts_1.commonPrompts.jsonFormatInstruction
+                    role: "user",
+                    content: emailContent
                 },
                 {
                     role: "assistant",

@@ -61,9 +61,10 @@ app.post('/analyzeEmail', async (req: Request, res: Response) => {
         const response = await openai.chat.completions.create({
             model: 'gpt-4o',
             messages: [
-                {
-                    role: "user",
-                    content: emailContent
+                { 
+                    role: "system", 
+                    content: commonPrompts.task 
+                    
                 },
                 { 
                     role: "system", 
@@ -71,13 +72,16 @@ app.post('/analyzeEmail', async (req: Request, res: Response) => {
                     
                 },
                 {
-                    role: "system",
-                    content: commonPrompts.endOfConversation
-                },
-                
-                {
                     role: "assistant",
                     content: commonPrompts.jsonFormatInstruction
+                },
+                {
+                    role: "system",
+                    content: commonPrompts.endOfConversation
+                }, 
+                {
+                    role: "user",
+                    content: emailContent
                 },
                 {
                     role: "assistant",

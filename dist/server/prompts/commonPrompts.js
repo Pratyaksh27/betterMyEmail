@@ -3,6 +3,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.commonPrompts = void 0;
 exports.commonPrompts = {
+    task: `
+    You will be provided with the contents of an email. Your task is to evaluate and improve the email based on the following criteria:
+    `,
     jsonFormatInstruction: `
       Please provide your response in the following JSON format:
   
