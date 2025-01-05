@@ -6,6 +6,8 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import { OpenAI } from 'openai';
 import dotenv from 'dotenv';
+import { toneTemplates } from './prompts/toneTemplates';
+import { commonPrompts } from './prompts/commonPrompts';
 dotenv.config();
 
 //require('dotenv').config();
@@ -51,53 +53,39 @@ app.post('/analyzeEmail', async (req: Request, res: Response) => {
     console.log('API Gateway Server: Analyzing Email Content...');
     const emailContent = req.body.emailContent;
     console.log('API Gateway Server: Email Content found: ', emailContent);
-    const selectedTone = req.body.selectedTone;
+    const selectedTone = req.body.selectedTone || 'professional';
+    const toneKey = selectedTone.toLowerCase().toString();
+    const toneTemplate = toneTemplates[toneKey] || toneTemplates['professional'];
     console.log('API Gateway Server: Selected Tone: ', selectedTone);
     try {
         const response = await openai.chat.completions.create({
             model: 'gpt-4o',
             messages: [
-                { 
-                    role: "system", 
-                    content: `You will be provided with the contents of an email. Your task is to evaluate and improve the email based on the following criteria:
-
-                    1. **Tone and Politeness:** Assess the tone of the email. If it is too aggressive, suggest ways to make it more polite and professional.
-                    2. **Spelling and Grammar:** Identify and correct any spelling or grammatical errors.
-                    3. **Conciseness:** If the email is too long or verbose, suggest ways to make it more concise without losing important information.
-                    4. **Clarity and Coherence:** Ensure the email is clear and coherent. Suggest improvements if the message is confusing or disjointed.
-                    5. **Call to Action:** Evaluate the effectiveness of the call to action. Suggest improvements if it is weak or unclear.
-                    6. **Formatting:** Suggest any formatting changes that could improve readability, such as using bullet points, paragraphs, or headings.
-                    7. **Overall Impact:** Provide a summary of the overall impact of the email and any additional suggestions to enhance its effectiveness.
-                    
-                    Please provide your response in the following JSON format:
-                    
-                    \`\`\`json
-                    {
-                      "recommended_email": "Your improved email here",
-                      "rationale": "Explanation of the improvements made"
-                    }
-                    \`\`\`
-                    
-                    Ensure that the JSON is valid and properly formatted. Do not include any additional text outside of the JSON block.
-                    Plus there is no need to add the "Subject" line in your response. Just the email content is enough.
-                    If the Receipient or Sender name is not present, do NOT add [Name] in the email content for either of them.`
-                    
-                },
-                {
-                    role: "system",
-                    content: "Consider your answer as the END of the conversation. Do NOT end your response with a follow up question like 'Do you need further assistance?' or 'Is there anything else I can help you with?'  or 'If you have any questions, please feel free to reach out' as this will confuse the end user. Dont suggest the user to ask further questions."
-                },
                 {
                     role: "user",
                     content: emailContent
                 },
+                { 
+                    role: "system", 
+                    content: toneTemplate
+                    
+                },
+                {
+                    role: "system",
+                    content: commonPrompts.endOfConversation
+                },
+                
                 {
                     role: "assistant",
-                    content: "Remember, only output the JSON response in the specified format without any additional text."
+                    content: commonPrompts.jsonFormatInstruction
                 },
                 {
                     role: "assistant",
-                    content: "Remember, DONT give Subject line. Dont add [Name] if recipient or sender name is not available."
+                    content: commonPrompts.onlyOutputJSON
+                },
+                {
+                    role: "assistant",
+                    content: commonPrompts.doNotAddSubject
                 }
             ],
             max_tokens: 1000,

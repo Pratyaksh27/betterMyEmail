@@ -154,6 +154,9 @@ function initializeToneDropdown() {
         localStorage.setItem('selectedTone', selectedTone);
         console.log(`Selected tone saved: ${selectedTone}`);
 
+        // Close the email Analysis Result dialog when the tone changes. 
+        // This is to ensure that the user sees the updated email content with the new tone
+        // And the spinner is shown while the new email content is being generated
         const dialog = document.getElementById('betterMyEmailDialog') as HTMLDialogElement;
         if (dialog)
         {
