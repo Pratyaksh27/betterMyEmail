@@ -72,7 +72,7 @@ app.post('/analyzeEmail', async (req: Request, res: Response) => {
                     
                 },
                 {
-                    role: "assistant",
+                    role: "system",
                     content: commonPrompts.jsonFormatInstruction
                 },
                 {
@@ -80,15 +80,23 @@ app.post('/analyzeEmail', async (req: Request, res: Response) => {
                     content: commonPrompts.endOfConversation
                 }, 
                 {
-                    role: "user",
-                    content: emailContent
+                    role: "system",
+                    content: commonPrompts.startOfEmailContent
                 },
                 {
-                    role: "assistant",
+                    role: "user",
+                    content: `Beginning of email content\n\n${emailContent}\n\nEnd of email content`
+                },
+                {
+                    role: "system",
+                    content: commonPrompts.endOfEmailContent
+                },
+                {
+                    role: "system",
                     content: commonPrompts.onlyOutputJSON
                 },
                 {
-                    role: "assistant",
+                    role: "system",
                     content: commonPrompts.doNotAddSubject
                 }
             ],
