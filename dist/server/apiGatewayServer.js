@@ -74,7 +74,7 @@ app.post('/analyzeEmail', (req, res) => __awaiter(void 0, void 0, void 0, functi
                     content: toneTemplate
                 },
                 {
-                    role: "assistant",
+                    role: "system",
                     content: commonPrompts_1.commonPrompts.jsonFormatInstruction
                 },
                 {
@@ -82,15 +82,23 @@ app.post('/analyzeEmail', (req, res) => __awaiter(void 0, void 0, void 0, functi
                     content: commonPrompts_1.commonPrompts.endOfConversation
                 },
                 {
-                    role: "user",
-                    content: emailContent
+                    role: "system",
+                    content: commonPrompts_1.commonPrompts.startOfEmailContent
                 },
                 {
-                    role: "assistant",
+                    role: "user",
+                    content: `Beginning of email content\n\n${emailContent}\n\nEnd of email content`
+                },
+                {
+                    role: "system",
+                    content: commonPrompts_1.commonPrompts.endOfEmailContent
+                },
+                {
+                    role: "system",
                     content: commonPrompts_1.commonPrompts.onlyOutputJSON
                 },
                 {
-                    role: "assistant",
+                    role: "system",
                     content: commonPrompts_1.commonPrompts.doNotAddSubject
                 }
             ],
