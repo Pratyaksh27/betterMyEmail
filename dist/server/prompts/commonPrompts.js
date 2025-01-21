@@ -30,6 +30,12 @@ exports.commonPrompts = {
       This was the end of the email content you need to evaluate and improve. Once again, you are not RESPONDING to the email. 
       Do NOT create a response for the email. Your only job is to improve the current email content provided.
     `,
+    doNotAddSignature: `
+      IF the Sender's or Recipient's name is NOT present in the email content, do NOT add Name place holders for name ([Name], [Your Name], [Recipient's Name] etc.)  in your response.
+      If the signature is NOT present in the email content, do NOT add a place holder signature ([Your Name], [Your Position], [Your contact informatio] etc. ) in your response.
+      If specific names or positions are not mentioned, do NOT add any place holder names or positions in your response.
+      If specific names or positions are mentioned in the email content, you can use them in your response.
+    `,
     endOfConversation: `
       Consider your answer as the END of the conversation. 
       Do NOT end your response with a follow-up question like 

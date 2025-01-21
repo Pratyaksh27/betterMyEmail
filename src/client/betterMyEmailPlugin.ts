@@ -73,8 +73,12 @@ export async function fetchBetterMyEmailAPI(event: Event) {
     // Show the spinner
     document.getElementById('betterMyEmailSpinner')!.style.display = 'block';
     const emailContentElement = document.querySelector('[role="textbox"][aria-label*="Message Body"]');
-    const emailContent = emailContentElement ? emailContentElement.textContent : '';
-    console.log('betterMyEmailPlugin.ts fetchBetterMyEmailAPI() Email Content: ', emailContent);
+    // const emailContent = emailContentElement ? emailContentElement.textContent : '';
+    // console.log('betterMyEmailPlugin.ts fetchBetterMyEmailAPI() Email Content: ', emailContent);
+    const { body: emailContent, signature } = extractSignature(emailContentElement?.innerHTML || '');
+
+    console.log('Email Body:', emailContent);
+    console.log('Email Signature:', signature);
 
     // Get the selected tone from Local Storage
     const selectedTone = localStorage.getItem('selectedTone') || 'professional';
@@ -118,7 +122,9 @@ export async function fetchBetterMyEmailAPI(event: Event) {
                     console.error('Received BetterMyEmail analysisResult JSON: ', data.analysisResult);
                     return;
                 }
-                const recommendedEmail = analysisResultJson.recommended_email;
+                const recommendedEmailContent = analysisResultJson.recommended_email;
+                // const finalEmail = recommendedEmail + '\n\n' + signature;
+                const recommendedEmail = `${recommendedEmailContent}${signature}`;
                 const rationale = analysisResultJson.rationale;
                 console.log('betterMyEmailPlugin.ts: Recommended Email: ', recommendedEmail);
                 console.log('betterMyEmailPlugin.ts: Rationale: ', rationale);
@@ -159,5 +165,28 @@ function addBetterMyEmailButton(){
         //console.log('betterMyEmailPlugin.js: Send Button NOT Found. Will check again.');
         setTimeout(addBetterMyEmailButton, 1000);  // Retry after 1 second
     }
+}
+
+function extractSignature(emailContent: string): { body: string, signature: string } {
+    const signatureRegexes = [
+        /<div class="gmail_signature">[\s\S]*<\/div>/s, // Gmail signatures
+        /<table[\s\S]*?<\/table>/s, // Table-based signatures
+        /<tr[\s\S]*<\/tr>/s, // Row-based signatures
+        /<td[^>]*border-top:[^>]*>[\s\S]*?<\/td>/s, // TD with border-top
+    ];
+
+    let signature = '';
+    let body = emailContent;
+
+    for (const regex of signatureRegexes) {
+        const match = body.match(regex);
+        if (match) {
+            signature = match[0];
+            body = body.replace(signature, '').trim();
+            break;
+        }
+    }
+
+    return { body, signature };
 }
 

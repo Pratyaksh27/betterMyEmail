@@ -73,6 +73,10 @@ app.post('/analyzeEmail', async (req: Request, res: Response) => {
                 },
                 {
                     role: "system",
+                    content: commonPrompts.doNotAddSignature
+                },
+                {
+                    role: "system",
                     content: commonPrompts.jsonFormatInstruction
                 },
                 {
@@ -90,6 +94,10 @@ app.post('/analyzeEmail', async (req: Request, res: Response) => {
                 {
                     role: "system",
                     content: commonPrompts.endOfEmailContent
+                },
+                {
+                    role: "system",
+                    content: commonPrompts.doNotAddSignature
                 },
                 {
                     role: "system",

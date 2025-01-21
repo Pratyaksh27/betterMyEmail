@@ -75,6 +75,10 @@ app.post('/analyzeEmail', (req, res) => __awaiter(void 0, void 0, void 0, functi
                 },
                 {
                     role: "system",
+                    content: commonPrompts_1.commonPrompts.doNotAddSignature
+                },
+                {
+                    role: "system",
                     content: commonPrompts_1.commonPrompts.jsonFormatInstruction
                 },
                 {
@@ -92,6 +96,10 @@ app.post('/analyzeEmail', (req, res) => __awaiter(void 0, void 0, void 0, functi
                 {
                     role: "system",
                     content: commonPrompts_1.commonPrompts.endOfEmailContent
+                },
+                {
+                    role: "system",
+                    content: commonPrompts_1.commonPrompts.doNotAddSignature
                 },
                 {
                     role: "system",
