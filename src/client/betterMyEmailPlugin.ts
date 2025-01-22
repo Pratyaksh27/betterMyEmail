@@ -73,8 +73,6 @@ export async function fetchBetterMyEmailAPI(event: Event) {
     // Show the spinner
     document.getElementById('betterMyEmailSpinner')!.style.display = 'block';
     const emailContentElement = document.querySelector('[role="textbox"][aria-label*="Message Body"]');
-    // const emailContent = emailContentElement ? emailContentElement.textContent : '';
-    // console.log('betterMyEmailPlugin.ts fetchBetterMyEmailAPI() Email Content: ', emailContent);
     const { body: emailContent, signature } = extractSignature(emailContentElement?.innerHTML || '');
 
     console.log('Email Body:', emailContent);
@@ -123,7 +121,6 @@ export async function fetchBetterMyEmailAPI(event: Event) {
                     return;
                 }
                 const recommendedEmailContent = analysisResultJson.recommended_email;
-                // const finalEmail = recommendedEmail + '\n\n' + signature;
                 const recommendedEmail = `${recommendedEmailContent}${signature}`;
                 const rationale = analysisResultJson.rationale;
                 console.log('betterMyEmailPlugin.ts: Recommended Email: ', recommendedEmail);
@@ -160,9 +157,8 @@ function addBetterMyEmailButton(){
             const betterMyEmailButton = createBetterMyEmailButton();
             sendButton.parentNode.insertBefore(betterMyEmailButton, sendButton.nextSibling);
         }
-        console.log('betterMyEmailPlugin.js: Send Button Found');
+        console.log('betterMyEmailPlugin.js: Send Button Found.');
     } else {
-        //console.log('betterMyEmailPlugin.js: Send Button NOT Found. Will check again.');
         setTimeout(addBetterMyEmailButton, 1000);  // Retry after 1 second
     }
 }
