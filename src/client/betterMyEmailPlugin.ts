@@ -73,12 +73,12 @@ export async function fetchBetterMyEmailAPI(event: Event) {
     // Show the spinner
     document.getElementById('betterMyEmailSpinner')!.style.display = 'block';
     const emailContentElement = document.querySelector('[role="textbox"][aria-label*="Message Body"]');
-    const { body: emailContent, signature } = extractSignature(emailContentElement?.innerHTML || '');
-
+    let { body: emailContent, signature } = extractSignature(emailContentElement?.innerHTML || '');
+    emailContent = removePlaceholders(emailContent);
     console.log('Email Body:', emailContent);
     console.log('Email Signature:', signature);
 
-    // Get the selected tone from Local Storage
+    // Get the selected tone from Local Storage 
     const selectedTone = localStorage.getItem('selectedTone') || 'professional';
     console.log('betterMyEmailPlugin.ts fetchBetterMyEmailAPI() Selected Tone: ', selectedTone);
     try {
@@ -120,7 +120,8 @@ export async function fetchBetterMyEmailAPI(event: Event) {
                     console.error('Received BetterMyEmail analysisResult JSON: ', data.analysisResult);
                     return;
                 }
-                const recommendedEmailContent = analysisResultJson.recommended_email;
+                let recommendedEmailContent = analysisResultJson.recommended_email;
+                recommendedEmailContent = removePlaceholders(recommendedEmailContent);
                 const recommendedEmail = `${recommendedEmailContent}${signature}`;
                 const rationale = analysisResultJson.rationale;
                 console.log('betterMyEmailPlugin.ts: Recommended Email: ', recommendedEmail);
@@ -184,5 +185,30 @@ function extractSignature(emailContent: string): { body: string, signature: stri
     }
 
     return { body, signature };
+}
+
+function removePlaceholders(emailContent: string): string {
+    // List of placeholders to be removed
+    const placeholders = [
+        /\[Your Name\]/g,
+        /\[Your Position\]/g,
+        /\[Your Company\]/g,
+        /\[Your Team\]/g,
+        /\[Your Contact Information\]/g,
+        /\[Recipient's Name\]/g,
+        /\[Recipient's Position\]/g,
+        /\[Recipient's Company\]/g,
+        /\[Your Company\/Team Name\]/g,
+        /\[Insert .*?\]/g, // Matches generic "Insert [something]" placeholders
+    ];
+
+    let cleanedContent = emailContent;
+
+    // Remove each placeholder
+    placeholders.forEach(placeholder => {
+        cleanedContent = cleanedContent.replace(placeholder, '').trim();
+    });
+
+    return cleanedContent;
 }
 
