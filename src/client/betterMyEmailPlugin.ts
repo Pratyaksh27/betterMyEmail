@@ -73,10 +73,12 @@ export async function fetchBetterMyEmailAPI(event: Event) {
     // Show the spinner
     document.getElementById('betterMyEmailSpinner')!.style.display = 'block';
     const emailContentElement = document.querySelector('[role="textbox"][aria-label*="Message Body"]');
-    const emailContent = emailContentElement ? emailContentElement.textContent : '';
-    console.log('betterMyEmailPlugin.ts fetchBetterMyEmailAPI() Email Content: ', emailContent);
+    let { body: emailContent, signature } = extractSignature(emailContentElement?.innerHTML || '');
+    emailContent = removePlaceholders(emailContent);
+    console.log('Email Body:', emailContent);
+    console.log('Email Signature:', signature);
 
-    // Get the selected tone from Local Storage
+    // Get the selected tone from Local Storage 
     const selectedTone = localStorage.getItem('selectedTone') || 'professional';
     console.log('betterMyEmailPlugin.ts fetchBetterMyEmailAPI() Selected Tone: ', selectedTone);
     try {
@@ -118,7 +120,9 @@ export async function fetchBetterMyEmailAPI(event: Event) {
                     console.error('Received BetterMyEmail analysisResult JSON: ', data.analysisResult);
                     return;
                 }
-                const recommendedEmail = analysisResultJson.recommended_email;
+                let recommendedEmailContent = analysisResultJson.recommended_email;
+                recommendedEmailContent = removePlaceholders(recommendedEmailContent);
+                const recommendedEmail = `${recommendedEmailContent}${signature}`;
                 const rationale = analysisResultJson.rationale;
                 console.log('betterMyEmailPlugin.ts: Recommended Email: ', recommendedEmail);
                 console.log('betterMyEmailPlugin.ts: Rationale: ', rationale);
@@ -154,10 +158,57 @@ function addBetterMyEmailButton(){
             const betterMyEmailButton = createBetterMyEmailButton();
             sendButton.parentNode.insertBefore(betterMyEmailButton, sendButton.nextSibling);
         }
-        console.log('betterMyEmailPlugin.js: Send Button Found');
+        console.log('betterMyEmailPlugin.js: Send Button Found.');
     } else {
-        //console.log('betterMyEmailPlugin.js: Send Button NOT Found. Will check again.');
         setTimeout(addBetterMyEmailButton, 1000);  // Retry after 1 second
     }
+}
+
+function extractSignature(emailContent: string): { body: string, signature: string } {
+    const signatureRegexes = [
+        /<div class="gmail_signature">[\s\S]*<\/div>/s, // Gmail signatures
+        /<table[\s\S]*?<\/table>/s, // Table-based signatures
+        /<tr[\s\S]*<\/tr>/s, // Row-based signatures
+        /<td[^>]*border-top:[^>]*>[\s\S]*?<\/td>/s, // TD with border-top
+    ];
+
+    let signature = '';
+    let body = emailContent;
+
+    for (const regex of signatureRegexes) {
+        const match = body.match(regex);
+        if (match) {
+            signature = match[0];
+            body = body.replace(signature, '').trim();
+            break;
+        }
+    }
+
+    return { body, signature };
+}
+
+function removePlaceholders(emailContent: string): string {
+    // List of placeholders to be removed
+    const placeholders = [
+        /\[Your Name\]/g,
+        /\[Your Position\]/g,
+        /\[Your Company\]/g,
+        /\[Your Team\]/g,
+        /\[Your Contact Information\]/g,
+        /\[Recipient's Name\]/g,
+        /\[Recipient's Position\]/g,
+        /\[Recipient's Company\]/g,
+        /\[Your Company\/Team Name\]/g,
+        /\[Insert .*?\]/g, // Matches generic "Insert [something]" placeholders
+    ];
+
+    let cleanedContent = emailContent;
+
+    // Remove each placeholder
+    placeholders.forEach(placeholder => {
+        cleanedContent = cleanedContent.replace(placeholder, '').trim();
+    });
+
+    return cleanedContent;
 }
 
