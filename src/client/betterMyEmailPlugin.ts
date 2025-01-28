@@ -73,9 +73,17 @@ export async function fetchBetterMyEmailAPI(event: Event) {
     // Show the spinner
     document.getElementById('betterMyEmailSpinner')!.style.display = 'block';
     const emailContentElement = document.querySelector('[role="textbox"][aria-label*="Message Body"]');
-    let { body: emailContent, signature } = extractSignature(emailContentElement?.innerHTML || '');
-    emailContent = removePlaceholders(emailContent);
-    console.log('Email Body:', emailContent);
+    if (!emailContentElement) {
+        console.error('betterMyEmailPlugin.ts: Email content not found');
+        return;
+    }
+    let currentEmailContentWithSignatureHTML = extractCurrentEmail(emailContentElement?.innerHTML || '');
+    let { body: currentEmailContentHTML, signature } = extractSignature(currentEmailContentWithSignatureHTML);
+    currentEmailContentHTML = removePlaceholders(currentEmailContentHTML);
+    let currentEmailContentPlainText = extractPlainText(currentEmailContentHTML);
+
+    console.log('Email Body:', currentEmailContentPlainText);
+    console.log('Email Body HTML:', currentEmailContentHTML);
     console.log('Email Signature:', signature);
 
     // Get the selected tone from Local Storage 
@@ -94,7 +102,7 @@ export async function fetchBetterMyEmailAPI(event: Event) {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ 
-                    emailContent: emailContent,
+                    emailContent: currentEmailContentHTML,
                     selectedTone: selectedTone,
                 })
             })
@@ -211,4 +219,32 @@ function removePlaceholders(emailContent: string): string {
 
     return cleanedContent;
 }
+
+function extractPlainText(htmlContent: string): string {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlContent; // Parse the HTML
+    return tempDiv.textContent || ''; // Return plain text
+}
+
+function extractCurrentEmail(emailHTML: string): string {
+    // Common markers indicating the start of an email thread
+    const threadMarkers = [
+        /On .* wrote:/, // Matches "On <date>, <person> wrote:"
+        /Forwarded message:/, // Matches "Forwarded message:"
+        /-----Original Message-----/, // Matches "-----Original Message-----"
+    ];
+
+    // Find and isolate the current email content
+    let trimmedHTML = emailHTML;
+    for (const marker of threadMarkers) {
+        const match = trimmedHTML.match(marker);
+        if (match) {
+            trimmedHTML = trimmedHTML.slice(0, match.index).trim(); // Trim everything after the marker
+            break;
+        }
+    }
+
+    return trimmedHTML;
+}
+
 
