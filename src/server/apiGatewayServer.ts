@@ -42,6 +42,28 @@ app.get('/test-openai', async (req: Request, res: Response) => {
     }
 });
 
+app.post('/createUser', async (req: Request, res: Response) => {
+    const { emailID, UUID } = req.body;
+    if (!emailID || !UUID) {
+        return res.status(400).send({ message: 'Create User API Endpoint: Missing Required Fields for creating user' });
+    }
+    try {
+        const create_user_query = `
+            INSERT INTO users (email_id, uuid)
+            VALUES ($1, $2)
+            ON CONFLICT (uuid) DO UPDATE SET email_id = $1
+            RETURNING *;`;
+        const client = await pool.connect();
+        const result = await client.query(create_user_query, [emailID, UUID]);
+        client.release();
+        console.log('API Gateway Server: User Created Successfully: ', result.rows[0]);
+        return res.json(result.rows[0]);
+    } catch (error) {
+        console.error('API Gateway Server: Error in creating user: ', error);
+        return res.status(500).send({ message: 'Failed to create user' });
+    }
+});
+
 /*
 ***  Analyze Email Endpoint: Receives an email content and analyzes it using OpenAI's GPT-4 model.
 ***  The email content is sent to the GPT-4 model for analysis along with Prompt messages.

@@ -43,6 +43,7 @@ console.log('betterMyEmailPlugin.js - Start');
 # If not, generate a new UUID and store it in the local storage
 */
 function ensureUUID() {
+    
     let uuid = localStorage.getItem('userUUID');
     if (!uuid || uuid === null || uuid === 'null' || uuid === 'undefined' || uuid === '') {
         uuid = uuidv4();
@@ -52,6 +53,46 @@ function ensureUUID() {
     } else {
         console.log('Existing User with UUID: ', uuid);
     }
+
+    let userEmail = localStorage.getItem('userEmailID');
+    console.log('betterMyEmailPlugin.ts: Browser Storage User Email ID: ', userEmail);
+    if (!userEmail || userEmail === null || userEmail === 'null' || userEmail === 'undefined' || userEmail === '') {
+        chrome.storage.local.get("storedEmail", (data) => {
+            
+            if (!data || !data.storedEmail) {
+                console.log('betterMyEmailPlugin.ts: Chrome Storage: User Email ID not found in Local Storage');
+                return;
+            }
+            userEmail = data.storedEmail;
+            console.log('betterMyEmailPlugin.ts:Chrome Storage :  User Email ID found: ', userEmail);
+            if (userEmail) {
+                localStorage.setItem('userEmailID', userEmail);
+                console.log('betterMyEmailPlugin.ts: Storing Email ID in Browsers Local Storage: ', userEmail);
+                createUser(userEmail, uuid);
+            }
+
+        });
+    } else {
+        console.log('*********************&&&&&&&&&&&&&&&&&&&*********************')
+    }
+
+}
+
+async function createUser(userEmailID: string, userUUID: string) {
+    console.log('betterMyEmailPlugin.ts: createUser() User Email ID: ', userEmailID, ' User UUID: ', userUUID);
+    const configs = await getConfigs();
+    const create_user_url = configs.app_URL + '/createUser';
+    console.log('betterMyEmailPlugin.ts: createUser() Create User URL: ', create_user_url, ' User Email ID: ', userEmailID, ' User UUID: ', userUUID);
+    await fetch(create_user_url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+            emailID: userEmailID,
+            UUID: userUUID
+        })
+    })
 }
 
 export function getConfigs(): Promise<any> {
