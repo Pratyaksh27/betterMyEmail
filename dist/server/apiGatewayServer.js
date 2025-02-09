@@ -69,6 +69,52 @@ app.post('/createUser', (req, res) => __awaiter(void 0, void 0, void 0, function
     }
 }));
 /*
+***  getUUIDFromEmail Endpoint: Receives an email ID and returns the UUID associated with the email ID.
+ */
+app.post("/getUUIDFromEmail", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { emailID } = req.body;
+    if (!emailID) {
+        return res.status(400).json({ error: "getUUIDFromEmail Endpoint: Email ID is required" });
+    }
+    try {
+        const query = "SELECT uuid FROM users WHERE email_id = $1";
+        const result = yield db_1.default.query(query, [emailID]);
+        if (result.rows.length > 0) {
+            res.status(200).json({ uuid: result.rows[0].uuid });
+        }
+        else {
+            res.status(200).json({ uuid: null });
+        }
+    }
+    catch (error) {
+        console.error("getUUIDFromEmail Endpoint: Error retrieving UUID:", error);
+        res.status(500).json({ error: "getUUIDFromEmail Endpoint: Internal Server Error" });
+    }
+}));
+/*
+***  getEmailFromUUID Endpoint: Receives a uuid and returns the Email ID associated with the email ID.
+ */
+app.post("/getEmailFromUUID", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { uuid } = req.body;
+    if (!uuid) {
+        return res.status(400).json({ error: "getEmailFromUUID Endpoint: UUID is required" });
+    }
+    try {
+        const query = "SELECT email_id FROM users WHERE uuid = $1";
+        const result = yield db_1.default.query(query, [uuid]);
+        if (result.rows.length > 0) {
+            res.status(200).json({ emailID: result.rows[0].email_id });
+        }
+        else {
+            res.status(200).json({ emailID: null });
+        }
+    }
+    catch (error) {
+        console.error("getEmailFromUUID Endpoint: Error retrieving Email ID:", error);
+        res.status(500).json({ error: "getEmailFromUUID Endpoint: Internal Server Error" });
+    }
+}));
+/*
 ***  Analyze Email Endpoint: Receives an email content and analyzes it using OpenAI's GPT-4 model.
 ***  The email content is sent to the GPT-4 model for analysis along with Prompt messages.
 ***  The response is a JSON object containing the analysis result.

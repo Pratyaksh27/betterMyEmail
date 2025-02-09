@@ -15,7 +15,7 @@ console.log('betterMyEmailPlugin.js - Start');
     console.log('betterMyEmailPlugin.ts: Script executing immediately after load');
     let sendButtonProcessed = false;
     // Ensure the user has a UUID stored in the local storage
-    ensureUUID();
+    UUIDtoEmailMapping();
 
     const observer = new MutationObserver(mutations => {
         mutations.forEach(mutation => {
@@ -42,41 +42,94 @@ console.log('betterMyEmailPlugin.js - Start');
 # Ensure the user has a UUID stored in the local storage
 # If not, generate a new UUID and store it in the local storage
 */
-function ensureUUID() {
-    
-    let uuid = localStorage.getItem('userUUID');
-    if (!uuid || uuid === null || uuid === 'null' || uuid === 'undefined' || uuid === '') {
+async function UUIDtoEmailMapping() {
+    console.log("Starting UUID to Email Mapping...");
+
+    // Step 1: Ensure Email consistency between Local Storage and Extension Storage
+    await EmailStorageMapping();
+
+    // Step 2: Retrieve UUID & Email from Local Storage
+    let uuid = localStorage.getItem("userUUID");
+    let userEmail = localStorage.getItem("userEmailID");
+
+    console.log("Current LS UUID:", uuid);
+    console.log("Current LS Email:", userEmail);
+
+    // Step 3: If UUID is missing but Email exists → Restore UUID from DB
+    if (!uuid && userEmail) {
+        console.log("UUID missing but Email exists. Retrieving UUID from DB...");
+        const fetchedUUID = await getUUIDFromEmail(userEmail);
+        if (fetchedUUID) {
+            localStorage.setItem("userUUID", fetchedUUID);
+            console.log("Restored UUID from DB:", fetchedUUID);
+        } else {
+            console.log("No UUID found in DB. Creating new UUID..");
+            uuid = uuidv4();
+            localStorage.setItem("userUUID", uuid);
+            createUser(userEmail, uuid);
+        }
+    }
+
+    // Step 4: If UUID exists but Email is missing → Restore Email from DB
+    else if (uuid && !userEmail) {
+        console.log("UUID exists but Email is missing. Retrieving Email from DB...");
+        const fetchedEmail = await getEmailFromUUID(uuid);
+        if (fetchedEmail) {
+            localStorage.setItem("userEmailID", fetchedEmail);
+            chrome.storage.sync.set({ storedEmail: fetchedEmail });
+            console.log("Restored Email from DB:", fetchedEmail);
+        }
+    }
+
+    // Step 5: If both UUID & Email are missing → Create new UUID
+    else if (!uuid && !userEmail) {
+        console.log("No UUID and No Email found. Generating a new UUID...");
         uuid = uuidv4();
-        if (uuid !== null){
-            localStorage.setItem('userUUID', uuid.toString());
-        }      
-    } else {
-        console.log('Existing User with UUID: ', uuid);
+        localStorage.setItem("userUUID", uuid);
     }
-
-    let userEmail = localStorage.getItem('userEmailID');
-    console.log('betterMyEmailPlugin.ts: Browser Storage User Email ID: ', userEmail);
-    if (!userEmail || userEmail === null || userEmail === 'null' || userEmail === 'undefined' || userEmail === '') {
-        chrome.storage.local.get("storedEmail", (data) => {
-            
-            if (!data || !data.storedEmail) {
-                console.log('betterMyEmailPlugin.ts: Chrome Storage: User Email ID not found in Local Storage');
-                return;
-            }
-            userEmail = data.storedEmail;
-            console.log('betterMyEmailPlugin.ts:Chrome Storage :  User Email ID found: ', userEmail);
-            if (userEmail) {
-                localStorage.setItem('userEmailID', userEmail);
-                console.log('betterMyEmailPlugin.ts: Storing Email ID in Browsers Local Storage: ', userEmail);
-                createUser(userEmail, uuid);
-            }
-
-        });
-    } else {
-        console.log('*********************&&&&&&&&&&&&&&&&&&&*********************')
-    }
-
 }
+
+
+// ✅ Helper Function: Ensure Email Consistency Between Local Storage & Extension Storage
+// We are storing email address in 2 places, extension storage and local storage.
+// Reason: Extension storage is persistent and local storage is accessible from content scripts.
+async function EmailStorageMapping() {
+    console.log("Ensuring Email Consistency Between Local Storage & Extension Storage");
+
+    // Get Email from Local Storage
+    let LSEmail = localStorage.getItem("userEmailID") || null;
+
+    // ✅ Fetch Email from Extension Storage properly
+    let ESEmail: string | null = await new Promise((resolve) => {
+        chrome.storage.sync.get("storedEmail", (data) => {
+            if (data && typeof data.storedEmail === "string") {
+                resolve(data.storedEmail);
+            } else {
+                resolve(null);  // Ensure we always return null instead of an empty object
+            }
+        });
+    });
+
+    console.log("LS Email:", LSEmail);
+    console.log("ES Email:", ESEmail);
+
+    // ✅ Sync Emails Correctly
+    if (ESEmail && !LSEmail) {
+        localStorage.setItem("userEmailID", ESEmail);
+        console.log("Synced ESEmail to LSEmail:", ESEmail);
+    } else if (!ESEmail && LSEmail) {
+        chrome.storage.sync.set({ storedEmail: LSEmail });
+        console.log("Synced LSEmail to ESEmail:", LSEmail);
+    } else if (ESEmail && LSEmail) {
+        localStorage.setItem("userEmailID", ESEmail); // Ensure ES email takes priority
+        console.log("Ensured LS priority:", ESEmail);
+    } else {
+        console.log("No Email found in LS or ES.");
+    }
+}
+
+
+
 
 async function createUser(userEmailID: string, userUUID: string) {
     console.log('betterMyEmailPlugin.ts: createUser() User Email ID: ', userEmailID, ' User UUID: ', userUUID);
@@ -95,6 +148,66 @@ async function createUser(userEmailID: string, userUUID: string) {
     })
 }
 
+/*
+# Get UUID from Email ID
+# API Gateway Endpoint: /getUUIDFromEmail
+# Receives an email ID and returns the UUID associated with the email ID.
+# If no UUID is found, it returns null. 
+*/
+async function getUUIDFromEmail(emailID: string) {
+    console.log('betterMyEmailPlugin.ts: getUUIDFromEmail() User Email ID: ', emailID);
+    const configs = await getConfigs();
+    const get_uuid_url = configs.app_URL + '/getUUIDFromEmail';
+    console.log('betterMyEmailPlugin.ts: getUUIDFromEmail() Get UUID URL: ', get_uuid_url, ' User Email ID: ', emailID);
+    try {
+        const response = await fetch(get_uuid_url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
+                emailID: emailID
+            })
+        });
+        const data = await response.json();
+        console.log('betterMyEmailPlugin.ts: getUUIDFromEmail() Response: ', data);
+        return data.uuid ? data.uuid : null;
+    } catch (error) {
+        console.error('betterMyEmailPlugin.ts: getUUIDFromEmail() Error: ', error);
+        return null;
+    }
+}
+
+/*
+# Get Email ID from UUID
+# API Gateway Endpoint: /getEmailFromUUID
+# Receives a UUID and returns the email ID associated with the UUID.
+# If no email ID is found, it returns null. 
+*/
+async function getEmailFromUUID(uuid: string) {
+    console.log('betterMyEmailPlugin.ts: getEmailFromUUID() User UUID: ', uuid);
+    const configs = await getConfigs();
+    const get_email_url = configs.app_URL + '/getEmailFromUUID';
+    console.log('betterMyEmailPlugin.ts: getEmailFromUUID() Get Email URL: ', get_email_url, ' User UUID: ', uuid);
+    try {
+        const response = await fetch(get_email_url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
+                uuid: uuid
+            })
+        });
+        const data = await response.json();
+        console.log('betterMyEmailPlugin.ts: getEmailFromUUID() Response: ', data);
+        return data.emailID ? data.emailID : null;
+    } catch (error) {
+        console.error('betterMyEmailPlugin.ts: getEmailFromUUID() Error: ', error);
+        return null;
+    }
+}
+
 export function getConfigs(): Promise<any> {
     return new Promise((resolve, reject) => {
         chrome.storage.sync.get(['config'], function(result: any) {
@@ -103,7 +216,7 @@ export function getConfigs(): Promise<any> {
                 resolve(result.config);
             } else {
                 console.log('betterMyEmailPlugin.ts: getConfigs() Configs NOT found');
-                reject(new Error('Configs not found'));
+                reject(new Error('Configs not found.'));
             }
         });
     });
