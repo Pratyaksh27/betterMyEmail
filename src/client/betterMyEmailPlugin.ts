@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { showBetterMyEmailResultDialog } from "./email_analysis/emailAnalysisResultDialog";
 import { getSpinnerHTML } from "./email_analysis/spinner";
+import e from 'express';
 /*
 End User can evaluate an email they’ve written to “Better my email” before sending. 
 The Plugin will “evaluate” the email and give personalized recommendations. 
@@ -20,8 +21,6 @@ console.log('betterMyEmailPlugin.js - Start');
     const observer = new MutationObserver(mutations => {
         mutations.forEach(mutation => {
             if (mutation.addedNodes.length > 0) {
-                // console.log('betterMyEmailPlugin.js: Mutation observed - checking for Send button');
-                //addSendButtonClickHandler();
                 addBetterMyEmailButton();
             }
         });
@@ -52,9 +51,6 @@ async function UUIDtoEmailMapping() {
     let uuid = localStorage.getItem("userUUID");
     let userEmail = localStorage.getItem("userEmailID");
 
-    console.log("Current LS UUID:", uuid);
-    console.log("Current LS Email:", userEmail);
-
     // Step 3: If UUID is missing but Email exists → Restore UUID from DB
     if (!uuid && userEmail) {
         console.log("UUID missing but Email exists. Retrieving UUID from DB...");
@@ -69,7 +65,6 @@ async function UUIDtoEmailMapping() {
             createUser(userEmail, uuid);
         }
     }
-
     // Step 4: If UUID exists but Email is missing → Restore Email from DB
     else if (uuid && !userEmail) {
         console.log("UUID exists but Email is missing. Retrieving Email from DB...");
@@ -77,16 +72,25 @@ async function UUIDtoEmailMapping() {
         if (fetchedEmail) {
             localStorage.setItem("userEmailID", fetchedEmail);
             chrome.storage.sync.set({ storedEmail: fetchedEmail });
-            console.log("Restored Email from DB:", fetchedEmail);
+            console.log("Restored Email from DB:");
         }
     }
-
     // Step 5: If both UUID & Email are missing → Create new UUID
     else if (!uuid && !userEmail) {
         console.log("No UUID and No Email found. Generating a new UUID...");
         uuid = uuidv4();
         localStorage.setItem("userUUID", uuid);
     }
+    else if (uuid && userEmail) {
+        console.log("UUID & Email are already present.");
+        const fetchedEmail = await getEmailFromUUID(uuid);
+        if (!fetchedEmail) {
+            // Both UUID and Email Found but User is not in DB, then Create User in DB
+            console.log("Creating User in DB with existing UUID & Email...");
+            createUser(userEmail, uuid);
+        }
+    }
+
 }
 
 
@@ -110,19 +114,16 @@ async function EmailStorageMapping() {
         });
     });
 
-    console.log("LS Email:", LSEmail);
-    console.log("ES Email:", ESEmail);
-
     // ✅ Sync Emails Correctly
     if (ESEmail && !LSEmail) {
         localStorage.setItem("userEmailID", ESEmail);
-        console.log("Synced ESEmail to LSEmail:", ESEmail);
+        console.log("Synced ESEmail to LSEmail:");
     } else if (!ESEmail && LSEmail) {
         chrome.storage.sync.set({ storedEmail: LSEmail });
-        console.log("Synced LSEmail to ESEmail:", LSEmail);
+        console.log("Synced LSEmail to ESEmail:");
     } else if (ESEmail && LSEmail) {
         localStorage.setItem("userEmailID", ESEmail); // Ensure ES email takes priority
-        console.log("Ensured LS priority:", ESEmail);
+        console.log("Ensured ES priority while syncing emails in Local and Extension Storages");
     } else {
         console.log("No Email found in LS or ES.");
     }
@@ -132,10 +133,9 @@ async function EmailStorageMapping() {
 
 
 async function createUser(userEmailID: string, userUUID: string) {
-    console.log('betterMyEmailPlugin.ts: createUser() User Email ID: ', userEmailID, ' User UUID: ', userUUID);
+    console.log('betterMyEmailPlugin.ts: createUser() called with uuid and email ID');
     const configs = await getConfigs();
     const create_user_url = configs.app_URL + '/createUser';
-    console.log('betterMyEmailPlugin.ts: createUser() Create User URL: ', create_user_url, ' User Email ID: ', userEmailID, ' User UUID: ', userUUID);
     await fetch(create_user_url, {
         method: 'POST',
         headers: {
@@ -155,10 +155,9 @@ async function createUser(userEmailID: string, userUUID: string) {
 # If no UUID is found, it returns null. 
 */
 async function getUUIDFromEmail(emailID: string) {
-    console.log('betterMyEmailPlugin.ts: getUUIDFromEmail() User Email ID: ', emailID);
+    console.log('betterMyEmailPlugin.ts: getUUIDFromEmail() called ');
     const configs = await getConfigs();
     const get_uuid_url = configs.app_URL + '/getUUIDFromEmail';
-    console.log('betterMyEmailPlugin.ts: getUUIDFromEmail() Get UUID URL: ', get_uuid_url, ' User Email ID: ', emailID);
     try {
         const response = await fetch(get_uuid_url, {
             method: 'POST',
@@ -170,7 +169,7 @@ async function getUUIDFromEmail(emailID: string) {
             })
         });
         const data = await response.json();
-        console.log('betterMyEmailPlugin.ts: getUUIDFromEmail() Response: ', data);
+        console.log('betterMyEmailPlugin.ts: getUUIDFromEmail() Successfully Called ');
         return data.uuid ? data.uuid : null;
     } catch (error) {
         console.error('betterMyEmailPlugin.ts: getUUIDFromEmail() Error: ', error);
@@ -185,10 +184,9 @@ async function getUUIDFromEmail(emailID: string) {
 # If no email ID is found, it returns null. 
 */
 async function getEmailFromUUID(uuid: string) {
-    console.log('betterMyEmailPlugin.ts: getEmailFromUUID() User UUID: ', uuid);
+    console.log('betterMyEmailPlugin.ts: getEmailFromUUID() called');
     const configs = await getConfigs();
     const get_email_url = configs.app_URL + '/getEmailFromUUID';
-    console.log('betterMyEmailPlugin.ts: getEmailFromUUID() Get Email URL: ', get_email_url, ' User UUID: ', uuid);
     try {
         const response = await fetch(get_email_url, {
             method: 'POST',
@@ -200,7 +198,7 @@ async function getEmailFromUUID(uuid: string) {
             })
         });
         const data = await response.json();
-        console.log('betterMyEmailPlugin.ts: getEmailFromUUID() Response: ', data);
+        console.log('betterMyEmailPlugin.ts: getEmailFromUUID() Successfully Called: ');
         return data.emailID ? data.emailID : null;
     } catch (error) {
         console.error('betterMyEmailPlugin.ts: getEmailFromUUID() Error: ', error);
@@ -212,7 +210,7 @@ export function getConfigs(): Promise<any> {
     return new Promise((resolve, reject) => {
         chrome.storage.sync.get(['config'], function(result: any) {
             if (result.config) {
-                console.log('betterMyEmailPlugin.ts: getConfigs() Configs found: ', result.config);
+                console.log('betterMyEmailPlugin.ts: getConfigs() Configs found: ');
                 resolve(result.config);
             } else {
                 console.log('betterMyEmailPlugin.ts: getConfigs() Configs NOT found');
@@ -236,10 +234,6 @@ export async function fetchBetterMyEmailAPI(event: Event) {
     currentEmailContentHTML = removePlaceholders(currentEmailContentHTML);
     let currentEmailContentPlainText = extractPlainText(currentEmailContentHTML);
 
-    console.log('Email Body:', currentEmailContentPlainText);
-    console.log('Email Body HTML:', currentEmailContentHTML);
-    console.log('Email Signature:', signature);
-
     // Get the selected tone from Local Storage 
     const selectedTone = localStorage.getItem('selectedTone') || 'professional';
     console.log('betterMyEmailPlugin.ts fetchBetterMyEmailAPI() Selected Tone: ', selectedTone);
@@ -247,7 +241,6 @@ export async function fetchBetterMyEmailAPI(event: Event) {
         const configs = await getConfigs();
         console.log('betterMyEmailPlugin.ts fetchBetterMyEmailAPI() Configs: ', configs);
         if (configs && configs.analysis_URL) {
-            console.log('betterMyEmailPlugin.ts fetchBetterMyEmailAPI() API Gateway URL: ', configs.analysis_URL);
             // Show a loading modal to the user while the LLM generates a response
             // showLoadingModal();
             await fetch(`${configs.analysis_URL}`, {
@@ -261,8 +254,7 @@ export async function fetchBetterMyEmailAPI(event: Event) {
                 })
             })
             .then(response => {
-                console.log('betterMyEmailPlugin.ts: Printing Better my Email Analysis Response: ');
-                console.log('betterMyEmailPlugin.ts: Better my Email Analysis Response: ', response);
+                console.log('betterMyEmailPlugin.ts: Better my Email Analysis Responded: ');
                 return response.json()
             })
             .then(data => {
@@ -279,15 +271,12 @@ export async function fetchBetterMyEmailAPI(event: Event) {
                     analysisResultJson = JSON.parse(jsonString);
                 } catch (error) {
                     console.error('betterMyEmailPlugin.ts Error: Parsing analysisResult JSON: ', error);
-                    console.error('Received BetterMyEmail analysisResult JSON: ', data.analysisResult);
                     return;
                 }
                 let recommendedEmailContent = analysisResultJson.recommended_email;
                 recommendedEmailContent = removePlaceholders(recommendedEmailContent);
                 const recommendedEmail = `${recommendedEmailContent}${signature}`;
                 const rationale = analysisResultJson.rationale;
-                console.log('betterMyEmailPlugin.ts: Recommended Email: ', recommendedEmail);
-                console.log('betterMyEmailPlugin.ts: Rationale: ', rationale);
                 // Hide the spinner when data is received
                 document.getElementById('betterMyEmailSpinner')!.style.display = 'none';
                 showBetterMyEmailResultDialog({ recommendedEmail, rationale });

@@ -56,7 +56,7 @@ app.post('/createUser', async (req: Request, res: Response) => {
         const client = await pool.connect();
         const result = await client.query(create_user_query, [emailID, UUID]);
         client.release();
-        console.log('API Gateway Server: User Created Successfully: ', result.rows[0]);
+        console.log('API Gateway Server: User Created Successfully: ');
         return res.json(result.rows[0]);
     } catch (error) {
         console.error('API Gateway Server: Error in creating user: ', error);
@@ -124,7 +124,7 @@ app.post("/getEmailFromUUID", async (req, res) => {
 app.post('/analyzeEmail', async (req: Request, res: Response) => {
     console.log('API Gateway Server: Analyzing Email Content...');
     const emailContent = req.body.emailContent;
-    console.log('API Gateway Server: Email Content found: ', emailContent);
+    console.log('API Gateway Server: Email Content found: ');
     const selectedTone = req.body.selectedTone || 'professional';
     const toneKey = selectedTone.toLowerCase().toString();
     const toneTemplate = toneTemplates[toneKey] || toneTemplates['professional'];
@@ -184,7 +184,7 @@ app.post('/analyzeEmail', async (req: Request, res: Response) => {
             temperature: 0.3,
         });
         const analysisResult = response.choices[0].message.content;
-        console.log('API Gateway Server: Email Analysis Result: ', analysisResult);
+        console.log('API Gateway Server: Email Analysis DDONE. Sending Results back ');
         return res.json({ analysisResult: analysisResult });
     } catch (error) {
         console.error('API Gateway Server: Error in Email analysis: ', error);
@@ -212,7 +212,7 @@ app.post('/submitFeedback', async (req: Request, res: Response) => {
         const client = await pool.connect();
         const result = await client.query(submit_feedback_query, [uuid, type, rating, feedback, uninstall_reason]);
         client.release();
-        console.log('API Gateway Server: Feedback Submitted Successfully: ', result.rows[0]);
+        console.log('API Gateway Server: User Feedback Submitted Successfully: ');
         return res.json(result.rows[0]);
     } catch (error) {
         console.error('API Gateway Server: Error in submitting feedback: ', error);
@@ -225,7 +225,7 @@ app.post('/submitUsageStats', async (req: Request, res: Response) => {
     const { uuid, total_uses, uses_since_last_feedback, recommendations_accepted, recommendations_discarded } = req.body;
     console.log('API Gateway Server: Usage Stats Data: ', { uuid, total_uses, uses_since_last_feedback });
     if (!uuid || total_uses == null || uses_since_last_feedback == null) {
-         return res.status(400).json({ error: 'SUage Stats Update: Missing required fields. Update failed' });  
+         return res.status(400).json({ error: 'Usage Stats Update: Missing required fields. Update failed' });  
     }
     try {
         const submit_usage_stats_query = `
@@ -236,7 +236,7 @@ app.post('/submitUsageStats', async (req: Request, res: Response) => {
         const client = await pool.connect();
         const result = await client.query(submit_usage_stats_query, [uuid, total_uses, uses_since_last_feedback, recommendations_accepted, recommendations_discarded]);
         client.release();
-        console.log('API Gateway Server: Usage Stats Submitted Successfully: ', result.rows[0]);
+        console.log('API Gateway Server: Usage Stats Submitted Successfully: ');
         return res.json(result.rows[0]);
     } catch (error) {
         console.error('API Gateway Server: Error in submitting usage stats: ', error);

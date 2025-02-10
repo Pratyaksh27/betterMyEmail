@@ -60,7 +60,7 @@ app.post('/createUser', (req, res) => __awaiter(void 0, void 0, void 0, function
         const client = yield db_1.default.connect();
         const result = yield client.query(create_user_query, [emailID, UUID]);
         client.release();
-        console.log('API Gateway Server: User Created Successfully: ', result.rows[0]);
+        console.log('API Gateway Server: User Created Successfully: ');
         return res.json(result.rows[0]);
     }
     catch (error) {
@@ -124,7 +124,7 @@ app.post("/getEmailFromUUID", (req, res) => __awaiter(void 0, void 0, void 0, fu
 app.post('/analyzeEmail', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log('API Gateway Server: Analyzing Email Content...');
     const emailContent = req.body.emailContent;
-    console.log('API Gateway Server: Email Content found: ', emailContent);
+    console.log('API Gateway Server: Email Content found: ');
     const selectedTone = req.body.selectedTone || 'professional';
     const toneKey = selectedTone.toLowerCase().toString();
     const toneTemplate = toneTemplates_1.toneTemplates[toneKey] || toneTemplates_1.toneTemplates['professional'];
@@ -182,7 +182,7 @@ app.post('/analyzeEmail', (req, res) => __awaiter(void 0, void 0, void 0, functi
             temperature: 0.3,
         });
         const analysisResult = response.choices[0].message.content;
-        console.log('API Gateway Server: Email Analysis Result: ', analysisResult);
+        console.log('API Gateway Server: Email Analysis DDONE. Sending Results back ');
         return res.json({ analysisResult: analysisResult });
     }
     catch (error) {
@@ -210,7 +210,7 @@ app.post('/submitFeedback', (req, res) => __awaiter(void 0, void 0, void 0, func
         const client = yield db_1.default.connect();
         const result = yield client.query(submit_feedback_query, [uuid, type, rating, feedback, uninstall_reason]);
         client.release();
-        console.log('API Gateway Server: Feedback Submitted Successfully: ', result.rows[0]);
+        console.log('API Gateway Server: User Feedback Submitted Successfully: ');
         return res.json(result.rows[0]);
     }
     catch (error) {
@@ -222,7 +222,7 @@ app.post('/submitUsageStats', (req, res) => __awaiter(void 0, void 0, void 0, fu
     const { uuid, total_uses, uses_since_last_feedback, recommendations_accepted, recommendations_discarded } = req.body;
     console.log('API Gateway Server: Usage Stats Data: ', { uuid, total_uses, uses_since_last_feedback });
     if (!uuid || total_uses == null || uses_since_last_feedback == null) {
-        return res.status(400).json({ error: 'SUage Stats Update: Missing required fields. Update failed' });
+        return res.status(400).json({ error: 'Usage Stats Update: Missing required fields. Update failed' });
     }
     try {
         const submit_usage_stats_query = `
@@ -233,7 +233,7 @@ app.post('/submitUsageStats', (req, res) => __awaiter(void 0, void 0, void 0, fu
         const client = yield db_1.default.connect();
         const result = yield client.query(submit_usage_stats_query, [uuid, total_uses, uses_since_last_feedback, recommendations_accepted, recommendations_discarded]);
         client.release();
-        console.log('API Gateway Server: Usage Stats Submitted Successfully: ', result.rows[0]);
+        console.log('API Gateway Server: Usage Stats Submitted Successfully: ');
         return res.json(result.rows[0]);
     }
     catch (error) {
